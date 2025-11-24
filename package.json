@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@stackframe/stack": "^2.8.52",
     "@vercel/functions": "^3.3.3",
     "next": "16.0.3",
     "pg": "^8.16.3",

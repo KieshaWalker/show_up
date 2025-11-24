@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackClientApp } from "../stack/client";
 import "./globals.css";
 import { inter } from "./fonts";
 
@@ -14,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} dark`}>
-      <body>{children}</body>
+      <body><StackProvider app={stackClientApp}><StackTheme>{children}</StackTheme></StackProvider></body>
     </html>
   );
 }
