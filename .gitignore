@@ -43,3 +43,6 @@ next-env.d.ts
 
 
 how-to.ts
+.env*.local
+
+data_base
