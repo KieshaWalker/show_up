@@ -3,10 +3,11 @@ import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackClientApp } from "../stack/client";
 import "./globals.css";
 import { inter } from "./fonts";
+import Navbar from "./pages/navbar";
 
 export const metadata: Metadata = {
   title: "ShowUp - Habit Tracker",
-  description: "A habit tracking app powered by intention and drive.",
+  description: "Build better habits. Transform your life.",
 };
 
 export default function RootLayout({
@@ -16,7 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} dark`}>
-      <body><StackProvider app={stackClientApp}><StackTheme>{children}</StackTheme></StackProvider></body>
+      <body>
+        <StackProvider app={stackClientApp}>
+          <StackTheme>
+            <Navbar />
+            {children}
+          </StackTheme>
+        </StackProvider>
+      </body>
     </html>
   );
 }

@@ -11,14 +11,24 @@ export default async function userPage() {
 
 
   if (!user) {
-    return <Link href="/handler/sign-in"><p>Sign In</p></Link>;
+    return (
+      <a href="/handler/sign-in" className="glass-button">
+        Sign In
+      </a>
+    );
   }
-  return (
 
-    <div>
-      <UserButton />
-      <p>Welcome, {user.displayName}!</p>
-     <Link href="/handler/sign-out"><p>Sign Out</p></Link>
+  return (
+    <div className="user-info">
+      <div className="user-avatar">
+        {user.displayName?.charAt(0).toUpperCase() || 'U'}
+      </div>
+      <div>
+        <h3>Welcome, {user.displayName}!</h3>
+        <a href="/handler/sign-out" className="nav-link">
+          Sign Out
+        </a>
+      </div>
     </div>
   );
 }

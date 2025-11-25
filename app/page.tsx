@@ -3,29 +3,43 @@ import Link from "next/link";
 import { checkDbConnection } from "./db";
 import Handler from "./handler/[...stack]/page";
 import userPage from "./handler/[...stack]/user";
+import { StackServerApp } from "@stackframe/stack";
+import { stackServerApp } from "@/stack/server";
+import Habits from "./habits/page";
 
 
 export default async function Home() {
   const result = await checkDbConnection();
+  const user = await stackServerApp.getUser();
+
+  if (!user) {
+    return (
+      <div className="hero-section">
+        <div className="hero-content fade-in-up">
+          <h1 className="hero-title">ShowUp</h1>
+          <p className="hero-subtitle">
+            Build better habits. Transform your life.
+          </p>
+          <a href="/handler/sign-in" className="hero-cta">
+            Start Building Habits
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 md:max-w-lg md:px-0 lg:max-w-xl">
-        <main className="flex flex-1 flex-col justify-left pt-20 pb-16 md:pt-28 md:pb-20 lg:pt-32 lg:pb-24">
-          <div className="mb-6 md:mb-7">
-       
-       {await userPage()}
+    <div className="main-content">
+      <div className="content-container">
+        <div className="user-profile fade-in-up">
+          {await userPage()}
+        </div>
 
-          </div>
-          <h1 className="text-3xl font-semibold leading-none tracking-tighter md:text-4xl md:leading-none lg:text-5xl lg:leading-none">
-           ShowUp
-          </h1>
-          <p className="mt-3.5 max-w-lg text-base leading-snug tracking-tight text-[#61646B] md:text-lg md:leading-snug lg:text-xl lg:leading-snug dark:text-[#94979E]">
-            A habit tracking app powered by intention and drive. 
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-5 md:mt-9 lg:mt-10">
-          </div>
-        </main>
+        <h1 className="page-title fade-in-up">Your Habit Journey Starts Here</h1>
+
+        <div className="fade-in-up">
+          {await Habits()}
+        </div>
       </div>
     </div>
   );
