@@ -5,8 +5,8 @@ import "./globals.css";
 import { inter } from "./fonts";
 
 export const metadata: Metadata = {
-  title: "Vercel + Neon",
-  description: "Use Neon with Vercel",
+  title: "ShowUp - Habit Tracker",
+  description: "A habit tracking app powered by intention and drive.",
 };
 
 export default function RootLayout({
