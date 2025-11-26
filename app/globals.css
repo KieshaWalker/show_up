@@ -1,18 +1,21 @@
 @import "tailwindcss";
 :root {
-  --background: #5c3f3f;
-  --foreground: #110d0d;
+  --background: #626554;
+  --foreground: #626554;
   --font-geist-sans: var(--font-inter);
   --font-geist-mono: 'Courier New', monospace;
-  --secondary-text: #61646B;
-
-  /* Modern color palette */
-  --primary-brown: #5c3f3f;
-  --secondary-brown: #8b6b5c;
-  --light-brown: #d4b8a5;
-  --cream: #f5f1ed;
-  --accent-gold: #d4af37;
-  --text-dark: #2c1810;
+  --secondary-text: rgb(12, 12, 12);
+  --black: #00000060;
+  /* Modern color palette
+  acb087
+  */
+  --primary-brown: #8c906c;
+  --secondary-brown: white;
+  --light-brown: #69778e;
+  --cream: #60664e;
+  --accent-gold: #60664e;
+  --test: #c6af95;
+  --text-dark: #132b3d;
   --text-light: #8b7355;
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
@@ -20,8 +23,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #5c3f3f;
-    --foreground: #110d0d;
+   --background: #626554;
+  --foreground: #626554;
   }
 }
 
@@ -32,15 +35,15 @@
 }
 
 body {
-  background: linear-gradient(135deg, var(--background) 0%, var(--secondary-brown) 100%);
-  color: var(--foreground);
+  background: linear-gradient(135deg, var(--background) 0%, var(--foreground) 100%);
+  color: var(--secondary-brown);
   font-family: var(--font-geist-sans);
   min-height: 100vh;
   line-height: 1.6;
 }
 
 /* Modern Glassmorphism Components */
-.glass-card {
+.glass-card, .hero-content {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -55,7 +58,7 @@ body {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
-.glass-button {
+.glass-button, .hero-cta {
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -94,6 +97,9 @@ body {
   text-align: center;
   max-width: 600px;
   z-index: 2;
+  background-color: #071c2b5e;
+  padding: 3rem;
+  border-radius: 5rem;
 }
 
 .hero-title {
@@ -101,7 +107,7 @@ body {
   font-weight: 700;
   color: var(--cream);
   margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 20px 10px 17px rgba(0, 0, 0, 0.712);
   letter-spacing: -0.02em;
 }
 
@@ -113,22 +119,11 @@ body {
   opacity: 0.9;
 }
 
-.hero-cta {
-  display: inline-block;
-  background: linear-gradient(135deg, var(--accent-gold) 0%, #b8860b 100%);
-  color: var(--text-dark);
-  padding: 16px 32px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
-}
+
 
 .hero-cta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 30px rgba(104, 99, 85, 0.336);
 }
 
 /* Navbar */
@@ -225,6 +220,9 @@ body {
   border-radius: 16px;
   padding: 2rem;
   transition: all 0.3s ease;
+  p {
+    color: var(--black);    }
+
 }
 
 .habit-card:hover {
@@ -395,4 +393,35 @@ body {
 
 .habits-section {
   margin-top: 7rem;
+}
+
+.page-title {
+  font-size: 3rem;
+  color: var(--black);
+}
+
+h3, p {
+  color: var(--black);
+}
+
+.navbar-container, .user-profile {
+  padding: 0 1rem;
+  a {
+    color: var(--black);}
+
+}
+
+.user-info h3 {
+  color: var(--black);
+}
+
+.add-habit-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 8em auto;
 }

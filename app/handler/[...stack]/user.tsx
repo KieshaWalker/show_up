@@ -19,6 +19,7 @@ export default async function userPage() {
   }
 
   return (
+    <main className="user-main">
     <div className="user-info">
       <div className="user-avatar">
         {user.displayName?.charAt(0).toUpperCase() || 'U'}
@@ -30,5 +31,6 @@ export default async function userPage() {
         </a>
       </div>
     </div>
+  </main>
   );
 }

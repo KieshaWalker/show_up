@@ -10,6 +10,9 @@ export default async function Habits() {
     <div className="habits-section">
       <div className="glass-card habit-card">
         <h2 className="habit-title">Your Habits</h2>
+        <a href="/habits/add" className="glass-button">
+          Add Habit
+        </a>
         <p className="habit-description">
           Track habits. Create lasting change.
         </p>
