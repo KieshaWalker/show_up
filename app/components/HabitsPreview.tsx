@@ -135,6 +135,32 @@ export default function HabitsPreview() {
     return habitLogs.some(log => log.habit_id === habitId && log.completed);
   };
 
+  const logFoodConsumption = async (foodId: number, quantity: number = 1) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch('/api/nutrition/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          foodId,
+          date: today,
+          quantity,
+        }),
+      });
+
+      if (response.ok) {
+        // Refresh food usage stats after logging
+        await fetchFoodUsageStats();
+      } else {
+        console.error('Failed to log food consumption');
+      }
+    } catch (error) {
+      console.error('Error logging food:', error);
+    }
+  };
+
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickAddTitle.trim()) return;
