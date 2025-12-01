@@ -22,6 +22,10 @@ CREATE TABLE IF NOT EXISTS habits (
   user_id TEXT NOT NULL,  -- TEXT type to accept UUID strings from Stack Auth
   title VARCHAR(255) NOT NULL,
   description TEXT,
+  frequency VARCHAR(20) DEFAULT 'daily' CHECK (frequency IN ('daily', 'weekly', 'monthly')),
+  color VARCHAR(7) DEFAULT '#007bff', -- Hex color for habit visualization
+  icon VARCHAR(50) DEFAULT 'target', -- Icon name for habit visualization
+  is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

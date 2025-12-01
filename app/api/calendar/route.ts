@@ -53,6 +53,20 @@ export async function GET(request: NextRequest) {
 
     const nutritionResult = await pool.query(nutritionQuery, [user.id, startDate, endDate]);
 
+    // Get count of unique habits created by this user
+    const uniqueHabitsQuery = `
+      SELECT COUNT(*) as count FROM habits WHERE user_id = $1
+    `;
+    const uniqueHabitsResult = await pool.query(uniqueHabitsQuery, [user.id]);
+    const totalUniqueHabits = parseInt(uniqueHabitsResult.rows[0].count);
+
+    // Get count of unique food items created by this user
+    const uniqueFoodQuery = `
+      SELECT COUNT(*) as count FROM food WHERE user_id = $1
+    `;
+    const uniqueFoodResult = await pool.query(uniqueFoodQuery, [user.id]);
+    const totalUniqueFood = parseInt(uniqueFoodResult.rows[0].count);
+
     // Organize data by date
     const calendarData: { [date: string]: any } = {};
 
@@ -101,7 +115,9 @@ export async function GET(request: NextRequest) {
       month,
       year,
       totalHabits: habitsResult.rows.length,
-      totalNutritionEntries: nutritionResult.rows.length
+      totalNutritionEntries: nutritionResult.rows.length,
+      totalUniqueHabits: totalUniqueHabits,
+      totalUniqueFood: totalUniqueFood
     });
 
   } catch (error) {

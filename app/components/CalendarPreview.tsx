@@ -6,6 +6,8 @@ import Link from "next/link";
 interface CalendarStats {
   totalHabits: number;
   totalNutritionEntries: number;
+  totalUniqueHabits: number;
+  totalUniqueFood: number;
   recentActivity: Array<{
     date: string;
     habits: number;
@@ -53,6 +55,8 @@ export default function CalendarPreview() {
       setStats({
         totalHabits: data.totalHabits || 0,
         totalNutritionEntries: data.totalNutritionEntries || 0,
+        totalUniqueHabits: data.totalUniqueHabits || 0,
+        totalUniqueFood: data.totalUniqueFood || 0,
         recentActivity
       });
     } catch (error) {
@@ -99,15 +103,15 @@ export default function CalendarPreview() {
       <div className="calendar-stats">
         <div className="stat-item">
           <div className="stat-number">{totalActivity}</div>
-          <div className="stat-label">Total Activities</div>
+          <div className="stat-label">This Month</div>
         </div>
         <div className="stat-item">
-          <div className="stat-number">{stats.totalHabits}</div>
+          <div className="stat-number">{stats.totalUniqueHabits}</div>
           <div className="stat-label">Habits Created</div>
         </div>
         <div className="stat-item">
-          <div className="stat-number">{stats.totalNutritionEntries}</div>
-          <div className="stat-label">Nutrition Entries</div>
+          <div className="stat-number">{stats.totalUniqueFood}</div>
+          <div className="stat-label">Foods Added</div>
         </div>
       </div>
 

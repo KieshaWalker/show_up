@@ -14,16 +14,17 @@ export async function handleHabitRequest(req?: NextRequest) {
       const formData = await req.formData();
       const title = formData.get("title") as string;
       const description = formData.get("description") as string;
+      const frequency = formData.get("frequency") as string || 'daily';
 
       const pool = getPool();
 
       // Insert the habit into the database
       const insertQuery = `
-        INSERT INTO habits (user_id, title, description)
-        VALUES ($1, $2, $3) RETURNING *
+        INSERT INTO habits (user_id, title, description, frequency)
+        VALUES ($1, $2, $3, $4) RETURNING *
       `;
 
-      const values = [user.id, title, description];
+      const values = [user.id, title, description, frequency];
 
       const result = await pool.query(insertQuery, values);
       const newHabit = result.rows[0];

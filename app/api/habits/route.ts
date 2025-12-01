@@ -6,7 +6,57 @@ import { authenticateUser } from "../../utils/auth";
 
 // Handle POST request to add a new habit
 export async function POST(request: NextRequest) {
-  return handleHabitRequest(request);
+  try {
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    const user = authResult;
+
+    const pool = getPool();
+
+    let title: string;
+    let description: string;
+    let frequency: string = 'daily';
+
+    // Check if request is JSON or form data
+    const contentType = request.headers.get('content-type');
+    if (contentType?.includes('application/json')) {
+      const jsonData = await request.json();
+      title = jsonData.title;
+      description = jsonData.description || '';
+      frequency = jsonData.frequency || 'daily';
+    } else {
+      const formData = await request.formData();
+      title = formData.get("title") as string;
+      description = formData.get("description") as string || '';
+      frequency = formData.get("frequency") as string || 'daily';
+    }
+
+    if (!title?.trim()) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    }
+
+    // Insert the habit into the database
+    const insertQuery = `
+      INSERT INTO habits (user_id, title, description, frequency)
+      VALUES ($1, $2, $3, $4) RETURNING *
+    `;
+
+    const values = [user.id, title.trim(), description.trim(), frequency];
+
+    const result = await pool.query(insertQuery, values);
+    const newHabit = result.rows[0];
+
+    return NextResponse.json({
+      message: "Habit added successfully",
+      habit: newHabit
+    }, { status: 201 });
+
+  } catch (error) {
+    console.error("Error adding habit:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 // Handle GET request to fetch habits for the user
