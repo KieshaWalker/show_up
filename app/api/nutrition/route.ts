@@ -3,10 +3,13 @@ import { handleNutritionRequest } from "../../nutrition/handler";
 import { stackServerApp } from "@/stack/server";
 import { getPool } from "../../db";
 
+// Handle POST request to add a new food item
 export async function POST(request: NextRequest) {
   return handleNutritionRequest(request);
 }
 
+
+// Handle GET request to fetch food items for the user
 export async function GET() {
   try {
     const user = await stackServerApp.getUser();
@@ -33,6 +36,8 @@ export async function GET() {
   }
 }
 
+
+// Handle DELETE request to remove a food item
 export async function DELETE(request: NextRequest) {
   try {
     const user = await stackServerApp.getUser();
@@ -69,6 +74,8 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
+
+// Handle PUT request to update a food item
 export async function PUT(request: NextRequest) {
   try {
     const user = await stackServerApp.getUser();

@@ -1,56 +1,246 @@
-import { handleHabitRequest } from "./handler";
+"use client";
 
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
+interface Habit {
+  id: number;
+  title: string;
+  description: string;
+  created_at: string;
+}
 
-export default async function Habits() {
-  // Example: Create a new habit (this would typically be done via a form submission)
-  // const newHabit = await createHabit("userId123", "Exercise", "Daily morning exercise");
+export default function HabitsPage() {
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [showEditForm, setShowEditForm] = useState(false);
 
-  return (
-    <div className="habits-section">
-      <div className="glass-card habit-card">
-        <h2 className="habit-title">Your Habits</h2>
-        <a href="/habits/add" className="glass-button">
-          Add Habit
-        </a>
-        <p className="habit-description">
-          Track habits. Create lasting change.
-        </p>
+  useEffect(() => {
+    fetchHabits();
+  }, []);
 
-        {/* Placeholder for habits list */}
-        <div className="habits-grid">
-          <div className="habit-card">
-            <h3 className="habit-title">Morning Exercise</h3>
-            <p className="habit-description">Start your day strong with movement</p>
-            <div className="habit-stats">
-              <span className="habit-streak">7 day streak</span>
-            </div>
-          </div>
+  const fetchHabits = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch("/api/habit");
 
-          <div className="habit-card">
-            <h3 className="habit-title">Read for 20 minutes</h3>
-            <p className="habit-description">Grow your mind daily</p>
-            <div className="habit-stats">
-              <span className="habit-streak">12 day streak</span>
-            </div>
-          </div>
+      if (!response.ok) {
+        throw new Error("Failed to fetch habits");
+      }
 
-          <div className="habit-card">
-            <h3 className="habit-title">Drink 8 glasses of water</h3>
-            <p className="habit-description">Fuel your body with hydration</p>
-            <div className="habit-stats">
-              <span className="habit-streak">3 day streak</span>
+      const data = await response.json();
+      setHabits(data.habits || []);
+    } catch (error) {
+      console.error("Error fetching habits:", error);
+      setError("Failed to load habits. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteHabit = async (habitId: number) => {
+    if (!confirm("Are you sure you want to delete this habit?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/habit?id=${habitId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setHabits(habits.filter(habit => habit.id !== habitId));
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to delete habit");
+      }
+    } catch (error) {
+      console.error("Error deleting habit:", error);
+      setError("Failed to delete habit. Please try again.");
+    }
+  };
+
+  const handleEditHabit = (habit: Habit) => {
+    setEditingHabit(habit);
+    setShowEditForm(true);
+  };
+
+  const handleUpdateHabit = async (formData: FormData) => {
+    if (!editingHabit) return;
+
+    try {
+      const data = new FormData();
+      data.append("id", editingHabit.id.toString());
+      data.append("title", formData.get("title") as string);
+      data.append("description", formData.get("description") as string);
+
+      const response = await fetch(`/api/habit?id=${editingHabit.id}`, {
+        method: "PUT",
+        body: data,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setHabits(habits.map(habit =>
+          habit.id === editingHabit.id ? result.habit : habit
+        ));
+        setShowEditForm(false);
+        setEditingHabit(null);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to update habit");
+      }
+    } catch (error) {
+      console.error("Error updating habit:", error);
+      setError("Failed to update habit. Please try again.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="habits-section">
+        <div className="content-container">
+          <div className="card">
+            <div className="text-center py-8">
+              <div className="animate-pulse">
+                <div className="h-8 bg-gray-300 rounded w-48 mx-auto mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-64 mx-auto"></div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+    );
+  }
 
-        {/* Debug info (remove in production) */}
-        <details className="mt-4">
-          <summary className="text-sm text-gray-400 cursor-pointer">Debug Info</summary>
-          <pre className="text-xs mt-2 p-2 bg-black/20 rounded overflow-auto">
-            {JSON.stringify(await handleHabitRequest(), null, 2)}
-          </pre>
-        </details>
+  return (
+    <div className="habits-section">
+      <div className="content-container">
+        <div className="card">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="page-title">Your Habits</h1>
+            <Link href="/habits/add" className="btn btn-primary">
+              Add New Habit
+            </Link>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
+              {error}
+              <button
+                onClick={() => setError(null)}
+                className="float-right ml-4 font-bold"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {habits.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-secondary mb-4">No habits found. Start building better habits!</p>
+              <Link href="/habits/add" className="btn btn-primary">
+                Add Your First Habit
+              </Link>
+            </div>
+          ) : (
+            <div className="habits-grid">
+              {habits.map((habit) => (
+                <div key={habit.id} className="habit-card">
+                  <h3 className="habit-title">{habit.title}</h3>
+                  <p className="habit-description">{habit.description}</p>
+                  <div className="habit-stats">
+                    <small className="text-tertiary">
+                      Created: {new Date(habit.created_at).toLocaleDateString()}
+                    </small>
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={() => handleEditHabit(habit)}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteHabit(habit.id)}
+                      className="btn btn-ghost btn-sm text-error hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {showEditForm && editingHabit && (
+          <EditHabitModal
+            habit={editingHabit}
+            onSave={handleUpdateHabit}
+            onCancel={() => {
+              setShowEditForm(false);
+              setEditingHabit(null);
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EditHabitModal({
+  habit,
+  onSave,
+  onCancel
+}: {
+  habit: Habit;
+  onSave: (formData: FormData) => void;
+  onCancel: () => void;
+}) {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    onSave(formData);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onCancel}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2>Edit Habit</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Habit Title</label>
+            <input
+              className="form-input"
+              type="text"
+              name="title"
+              defaultValue={habit.title}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Description</label>
+            <textarea
+              className="form-input"
+              name="description"
+              defaultValue={habit.description}
+              rows={3}
+              required
+            />
+          </div>
+          <div className="modal-actions">
+            <button type="button" onClick={onCancel} className="btn btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              Update Habit
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
