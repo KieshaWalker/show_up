@@ -1,8 +1,8 @@
 import { handleHabitRequest } from "@/app/habits/handler";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { stackServerApp } from "@/stack/server";
 import { getPool } from "../../db";
+import { authenticateUser } from "../../utils/auth";
 
 // Handle POST request to add a new habit
 export async function POST(request: NextRequest) {
@@ -12,10 +12,11 @@ export async function POST(request: NextRequest) {
 // Handle GET request to fetch habits for the user
 export async function GET() {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    const user = authResult;
 
     const pool = getPool();
 
@@ -39,10 +40,11 @@ export async function GET() {
 // Handle DELETE request to remove a habit
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    const user = authResult;
 
     const { searchParams } = new URL(request.url);
     const habitId = searchParams.get('id');
@@ -72,10 +74,11 @@ export async function DELETE(request: NextRequest) {
 // Handle PUT request to update a habit
 export async function PUT(request: NextRequest) {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    const user = authResult;
 
     const formData = await request.formData();
     const habitId = formData.get("id") as string;

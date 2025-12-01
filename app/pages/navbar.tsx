@@ -59,6 +59,9 @@ const Navbar: React.FC = () => {
                 <a href="/habits" className="nav-link">
                   Your Habits
                 </a>
+                <a href="/calendar" className="nav-link">
+                  Calendar
+                </a>
                 <a href="/handler/sign-out" className="nav-link">
                   Sign Out
                 </a>
@@ -95,6 +98,9 @@ const Navbar: React.FC = () => {
               <>
                 <a href="/habits" className="mobile-nav-link" onClick={closeMenu}>
                   Your Habits
+                </a>
+                <a href="/calendar" className="mobile-nav-link" onClick={closeMenu}>
+                  Calendar
                 </a>
                 <a href="/handler/sign-out" className="mobile-nav-link" onClick={closeMenu}>
                   Sign Out

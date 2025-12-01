@@ -10,8 +10,17 @@ interface Habit {
   created_at: string;
 }
 
+interface HabitLog {
+  id: number;
+  habit_id: number;
+  completed: boolean;
+  date: string;
+  notes?: string;
+}
+
 export default function HabitsPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
+  const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -19,13 +28,14 @@ export default function HabitsPage() {
 
   useEffect(() => {
     fetchHabits();
+    fetchTodayLogs();
   }, []);
 
   const fetchHabits = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("/api/habit");
+      const response = await fetch("/api/habits");
 
       if (!response.ok) {
         throw new Error("Failed to fetch habits");
@@ -39,6 +49,49 @@ export default function HabitsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchTodayLogs = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch(`/api/habits/log?date=${today}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setHabitLogs(data.habitLogs || []);
+      }
+    } catch (error) {
+      console.error("Error fetching habit logs:", error);
+    }
+  };
+
+  const logHabitCompletion = async (habitId: number, completed: boolean) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch('/api/habits/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          habitId,
+          date: today,
+          completed,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchTodayLogs(); // Refresh logs
+      } else {
+        console.error('Failed to log habit completion');
+      }
+    } catch (error) {
+      console.error('Error logging habit:', error);
+    }
+  };
+
+  const isHabitCompletedToday = (habitId: number) => {
+    return habitLogs.some(log => log.habit_id === habitId && log.completed);
   };
 
   const handleDeleteHabit = async (habitId: number) => {
@@ -150,7 +203,15 @@ export default function HabitsPage() {
             <div className="habits-grid">
               {habits.map((habit) => (
                 <div key={habit.id} className="habit-card">
-                  <h3 className="habit-title">{habit.title}</h3>
+                  <div className="flex items-center gap-3 mb-3">
+                    <input
+                      type="checkbox"
+                      checked={isHabitCompletedToday(habit.id)}
+                      onChange={(e) => logHabitCompletion(habit.id, e.target.checked)}
+                      className="w-5 h-5 text-accent border-gray-300 rounded focus:ring-accent"
+                    />
+                    <h3 className="habit-title">{habit.title}</h3>
+                  </div>
                   <p className="habit-description">{habit.description}</p>
                   <div className="habit-stats">
                     <small className="text-tertiary">

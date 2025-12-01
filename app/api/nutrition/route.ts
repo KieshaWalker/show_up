@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleNutritionRequest } from "../../nutrition/handler";
-import { stackServerApp } from "@/stack/server";
 import { getPool } from "../../db";
+import { authenticateUser } from "../../utils/auth";
 
 // Handle POST request to add a new food item
 export async function POST(request: NextRequest) {
@@ -12,10 +12,11 @@ export async function POST(request: NextRequest) {
 // Handle GET request to fetch food items for the user
 export async function GET() {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    const user = authResult;
 
     const pool = getPool();
 
@@ -40,10 +41,11 @@ export async function GET() {
 // Handle DELETE request to remove a food item
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    const user = authResult;
 
     const { searchParams } = new URL(request.url);
     const itemId = searchParams.get('id');
@@ -78,10 +80,11 @@ export async function DELETE(request: NextRequest) {
 // Handle PUT request to update a food item
 export async function PUT(request: NextRequest) {
   try {
-    const user = await stackServerApp.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
     }
+    const user = authResult;
 
     const { searchParams } = new URL(request.url);
     const itemId = searchParams.get('id');

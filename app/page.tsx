@@ -5,7 +5,9 @@ import Handler from "./handler/[...stack]/page";
 import userPage from "./handler/[...stack]/user";
 import { StackServerApp } from "@stackframe/stack";
 import { stackServerApp } from "@/stack/server";
-import Habits from "./habits/page";
+import HabitsPreview from "./components/HabitsPreview";
+import NutritionPreview from "./components/NutritionPreview";
+import CalendarPreview from "./components/CalendarPreview";
 
 
 export default async function Home() {
@@ -35,10 +37,12 @@ export default async function Home() {
           {await userPage()}
         </div>
 
-        <h1 className="page-title fade-in-up">Your Habit Journey Starts Here</h1>
+        <h1 className="page-title fade-in-up">Your Journey Starts Here</h1>
 
         <div className="fade-in-up">
-          {await Habits()}
+          <HabitsPreview />
+          <NutritionPreview />
+          <CalendarPreview />
         </div>
       </div>
     </div>

@@ -27,14 +27,29 @@ interface FoodItem {
   potassium: number;
 }
 
+interface NutritionLog {
+  id: number;
+  food_id: number;
+  quantity: number;
+  date: string;
+  notes?: string;
+  name: string;
+  calories: number;
+  serving_size: string;
+}
+
 export default function NutritionPage() {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [nutritionLogs, setNutritionLogs] = useState<NutritionLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showLogForm, setShowLogForm] = useState(false);
+  const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
 
   useEffect(() => {
     fetchFoodItems();
+    fetchTodayLogs();
   }, []);
 
   const fetchFoodItems = async () => {
@@ -49,6 +64,54 @@ export default function NutritionPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchTodayLogs = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch(`/api/nutrition/log?date=${today}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setNutritionLogs(data.nutritionLogs || []);
+      }
+    } catch (error) {
+      console.error('Error fetching nutrition logs:', error);
+    }
+  };
+
+  const logNutrition = async (foodId: number, quantity: number, notes?: string) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch('/api/nutrition/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          foodId,
+          date: today,
+          quantity,
+          notes,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchTodayLogs(); // Refresh logs
+        setShowLogForm(false);
+        setSelectedFood(null);
+      } else {
+        console.error('Failed to log nutrition');
+      }
+    } catch (error) {
+      console.error('Error logging nutrition:', error);
+    }
+  };
+
+  const getTodaysConsumption = (foodId: number) => {
+    return nutritionLogs
+      .filter(log => log.food_id === foodId)
+      .reduce((total, log) => total + (log.quantity * log.calories), 0);
   };
 
   const handleDelete = async (itemId: number) => {
@@ -133,6 +196,7 @@ export default function NutritionPage() {
                   <th>Serving Size</th>
                   <th>Calories</th>
                   <th>Protein (g)</th>
+                  <th>Today's Calories</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -143,7 +207,17 @@ export default function NutritionPage() {
                     <td>{food.serving_size}</td>
                     <td>{food.calories}</td>
                     <td>{food.protein}</td>
+                    <td>{getTodaysConsumption(food.id)} cal</td>
                     <td>
+                      <button
+                        onClick={() => {
+                          setSelectedFood(food);
+                          setShowLogForm(true);
+                        }}
+                        className="glass-button action-btn"
+                      >
+                        Log
+                      </button>
                       <button
                         onClick={() => handleEdit(food)}
                         className="glass-button action-btn"
@@ -165,16 +239,75 @@ export default function NutritionPage() {
         )}
       </div>
 
-      {showEditForm && editingItem && (
-        <EditFoodModal
-          item={editingItem}
-          onSave={handleUpdate}
+      {showLogForm && selectedFood && (
+        <LogNutritionModal
+          food={selectedFood}
+          onSave={logNutrition}
           onCancel={() => {
-            setShowEditForm(false);
-            setEditingItem(null);
+            setShowLogForm(false);
+            setSelectedFood(null);
           }}
         />
       )}
+    </div>
+  );
+}
+
+function LogNutritionModal({
+  food,
+  onSave,
+  onCancel
+}: {
+  food: FoodItem;
+  onSave: (foodId: number, quantity: number, notes?: string) => void;
+  onCancel: () => void;
+}) {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const quantity = parseFloat(formData.get('quantity') as string) || 1;
+    const notes = formData.get('notes') as string;
+    onSave(food.id, quantity, notes);
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h2>Log Nutrition: {food.name}</h2>
+        <form onSubmit={handleSubmit}>
+          <label>
+            Quantity (servings):
+            <input
+              className="label-input"
+              type="number"
+              step="0.1"
+              name="quantity"
+              defaultValue="1"
+              min="0.1"
+              required
+            />
+          </label>
+
+          <label>
+            Notes (optional):
+            <textarea
+              className="label-input"
+              name="notes"
+              rows={3}
+              placeholder="Any additional notes..."
+            />
+          </label>
+
+          <div className="modal-actions">
+            <button type="button" onClick={onCancel} className="glass-button cancel-btn">
+              Cancel
+            </button>
+            <button type="submit" className="glass-button save-btn">
+              Log Nutrition
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

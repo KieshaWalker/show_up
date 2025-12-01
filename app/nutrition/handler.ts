@@ -1,15 +1,15 @@
 
 // Nutrition handler to process nutrition related requests
 import { NextRequest, NextResponse } from "next/server";
-import { stackServerApp } from "@/stack/server";
 import { getPool } from "../db";
+import { authenticateUser } from "../utils/auth";
 
 export async function handleNutritionRequest(req: NextRequest) {
-  const user = await stackServerApp.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const authResult = await authenticateUser();
+  if (authResult instanceof NextResponse) {
+    return authResult;
   }
+  const user = authResult;
 
   if (req.method === "POST") {
     try {
