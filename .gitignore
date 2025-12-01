@@ -42,7 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 
-how-to-tutorials.ts
+how-to.txt
 .env*.local
 
 data_base

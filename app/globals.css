@@ -48,7 +48,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #000000;
+  --background: #626554;
     --surface: #1c1c1e;
     --surface-secondary: #2c2c2e;
     --text-primary: #ffffff;
@@ -286,6 +286,20 @@ body {
   letter-spacing: -0.01em;
 }
 
+.navbar-logo {
+  transform: translateY(-30%);
+  z-index: 1001;
+  position: absolute;
+  height: 176px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  transition: all 0.2s ease;
+}
+
+.navbar-logo:hover {
+  filter: brightness(0) invert(0.8);
+}
+
 .navbar-nav {
   display: flex;
   gap: 2rem;
@@ -295,7 +309,7 @@ body {
 
 
 .hamburger-menu {
-
+  display: none;
   flex-direction: column;
   cursor: pointer;
   padding: 8px;
@@ -309,13 +323,16 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.hamburger-line {
-  width: 24px;
-  height: 2px;
-  background: var(--text-primary);
-  margin: 3px 0;
-  transition: all 0.3s ease;
-  border-radius: 1px;
+.hamburger-menu.active .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
 }
 
 /* Mobile Menu Overlay */
@@ -330,12 +347,15 @@ body {
   -webkit-backdrop-filter: blur(5px);
   z-index: 999;
   opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
   transition: all 0.3s ease;
 }
 
 .mobile-menu-overlay.active {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .mobile-menu {

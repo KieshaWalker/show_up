@@ -36,11 +36,15 @@ const Navbar: React.FC = () => {
       <nav className="modern-navbar">
         <div className="navbar-container">
           <a href="/" className="navbar-brand">
-            ShowUp
+            <img 
+              src="/show_up.svg" 
+              alt="ShowUp" 
+              className="navbar-logo"
+            />
           </a>
 
           {/* Hamburger Menu Button */}
-          <button className="hamburger-menu" onClick={toggleMenu}>
+          <button className={`hamburger-menu ${isMenuOpen ? 'active' : ''}`} onClick={toggleMenu}>
             <span className="hamburger-line"></span>
             <span className="hamburger-line"></span>
             <span className="hamburger-line"></span>
@@ -76,7 +80,7 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Menu Overlay */}
       <div className={`mobile-menu-overlay ${isMenuOpen ? 'active' : ''}`} onClick={closeMenu}>
-        <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+        <div className={`mobile-menu ${isMenuOpen ? 'active' : ''}`} onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
             <a href="/" className="mobile-menu-brand" onClick={closeMenu}>
               ShowUp
