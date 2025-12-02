@@ -29,7 +29,8 @@ export async function GET() {
     const result = await pool.query(query, [user.id]);
     const foodItems = result.rows;
 
-    return NextResponse.json({ foodItems });
+    return NextResponse.json({ foodItems }); // this returns the food items in the response, but i want it to just log them
+
     console.log("Fetched food items:", foodItems);
   } catch (error) {
     console.error("Error fetching food items:", error);

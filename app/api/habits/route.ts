@@ -21,6 +21,10 @@ import { authenticateUser } from "../../utils/auth";
  * @param request - Next.js request object containing habit data
  * @returns Promise<NextResponse> - Success response with created habit or error
  */
+
+
+
+// POST HABITS // /// // 
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user - returns user object or unauthorized response
@@ -34,7 +38,11 @@ export async function POST(request: NextRequest) {
 
     let title: string;
     let description: string;
-    let frequency: string = 'daily';
+    let frequency: string;
+    let color = 'blue';
+    let icon = 'star';
+    let is_active = true;
+
 
     // Handle both JSON and FormData request formats
     const contentType = request.headers.get('content-type');
@@ -57,19 +65,18 @@ export async function POST(request: NextRequest) {
 
     // Insert new habit into database
     const insertQuery = `
-      INSERT INTO habits (user_id, title, description, frequency)
-      VALUES ($1, $2, $3, $4) RETURNING *
+      INSERT INTO habits (user_id, title, description, frequency, color, icon, is_active, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
     `;
 
-    const values = [user.id, title.trim(), description.trim(), frequency];
+    const values = [user.id, title.trim(), description.trim(), frequency, color, icon, is_active, new Date()];
 
     const result = await pool.query(insertQuery, values);
     const newHabit = result.rows[0];
 
-    return NextResponse.json({
-      message: "Habit added successfully",
-      habit: newHabit
-    }, { status: 201 });
+   
+    return NextResponse.redirect(new URL('/', request.url));
+
 
   } catch (error) {
     console.error("Error adding habit:", error);

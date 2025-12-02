@@ -6,7 +6,8 @@
 
 -- Or drop and recreate (WARNING: This will delete existing data)
 
-DROP TABLE IF EXISTS habits;
+-- drop table and dependent objects if they exist
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+DROP TABLE IF EXISTS habits CASCADE;
 
 -- Create the habits table for habit tracking
 CREATE TABLE IF NOT EXISTS habits (
@@ -31,6 +33,7 @@ CREATE TABLE IF NOT EXISTS habits (
 
 -- Create an index on user_id for faster queries
 CREATE INDEX IF NOT EXISTS idx_habits_user_id ON habits(user_id);
+DROP TABLE IF EXISTS food CASCADE;
 
 -- Create the food table for nutrition tracking
 CREATE TABLE IF NOT EXISTS food (
@@ -58,6 +61,7 @@ CREATE TABLE IF NOT EXISTS food (
 
 -- Create indexes for food table
 CREATE INDEX IF NOT EXISTS idx_food_user_id ON food(user_id);
+DROP TABLE IF EXISTS habit_logs CASCADE;
 
 -- Create habit_logs table for daily habit tracking
 CREATE TABLE IF NOT EXISTS habit_logs (
@@ -77,6 +81,7 @@ CREATE INDEX IF NOT EXISTS idx_habit_logs_habit_id ON habit_logs(habit_id);
 CREATE INDEX IF NOT EXISTS idx_habit_logs_user_id ON habit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_habit_logs_date ON habit_logs(date);
 
+DROP TABLE IF EXISTS nutrition_logs CASCADE;
 -- Create nutrition_logs table for daily nutrition tracking
 CREATE TABLE IF NOT EXISTS nutrition_logs (
   id SERIAL PRIMARY KEY,
@@ -94,8 +99,8 @@ CREATE INDEX IF NOT EXISTS idx_nutrition_logs_food_id ON nutrition_logs(food_id)
 CREATE INDEX IF NOT EXISTS idx_nutrition_logs_user_id ON nutrition_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_nutrition_logs_date ON nutrition_logs(date);
 
-
-
+DROP TABLE IF EXISTS tasks CASCADE;
+-- Create tasks table for task management
 
 CREATE TABLE IF NOT EXISTS tasks (
   id SERIAL PRIMARY KEY,

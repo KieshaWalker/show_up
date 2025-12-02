@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "../db";
 import { authenticateUser } from "../utils/auth";
+import { sources } from "next/dist/compiled/webpack/webpack";
 
 export async function handleNutritionRequest(req: NextRequest) {
   const authResult = await authenticateUser();
@@ -52,12 +53,11 @@ export async function handleNutritionRequest(req: NextRequest) {
       ];
 
       const result = await pool.query(insertQuery, values);
+      const transformed = {...result, source: 'api/food/route.ts'};
       const newFoodItem = result.rows[0];
 
-      return NextResponse.json({
-        message: "Food item added successfully",
-        foodItem: newFoodItem
-      }, { status: 201 });
+      // Redirect to home page after successful food item creation
+      return NextResponse.redirect(new URL('/', req.url));
 
     } catch (error) {
       console.error("Error adding food item:", error);

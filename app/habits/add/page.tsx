@@ -8,7 +8,7 @@ export default async function AddHabit() {
   return (
     <div className="add-habit-container">
       <h2 className="add-habit-title">Add a New Habit</h2>
-      <form action="/api/habit" method="POST"
+      <form action="/api/habits" method="POST"
       className="add-habit-form">
         <label className="add-habit-label">
           Habit Name:
