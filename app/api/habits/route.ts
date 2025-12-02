@@ -1,12 +1,29 @@
+/**
+ * Habits API Route Handler
+ *
+ * RESTful API endpoints for managing user habits.
+ * Supports CRUD operations: Create, Read, Update, Delete habits.
+ * All endpoints require user authentication.
+ */
+
 import { handleHabitRequest } from "@/app/habits/handler";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { getPool } from "../../db";
 import { authenticateUser } from "../../utils/auth";
 
-// Handle POST request to add a new habit
+/**
+ * POST - Create a new habit
+ *
+ * Creates a new habit for the authenticated user.
+ * Accepts both JSON and FormData formats for flexibility.
+ *
+ * @param request - Next.js request object containing habit data
+ * @returns Promise<NextResponse> - Success response with created habit or error
+ */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user - returns user object or unauthorized response
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -19,7 +36,7 @@ export async function POST(request: NextRequest) {
     let description: string;
     let frequency: string = 'daily';
 
-    // Check if request is JSON or form data
+    // Handle both JSON and FormData request formats
     const contentType = request.headers.get('content-type');
     if (contentType?.includes('application/json')) {
       const jsonData = await request.json();
@@ -33,11 +50,12 @@ export async function POST(request: NextRequest) {
       frequency = formData.get("frequency") as string || 'daily';
     }
 
+    // Validate required fields
     if (!title?.trim()) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
 
-    // Insert the habit into the database
+    // Insert new habit into database
     const insertQuery = `
       INSERT INTO habits (user_id, title, description, frequency)
       VALUES ($1, $2, $3, $4) RETURNING *
@@ -59,9 +77,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Handle GET request to fetch habits for the user
+/**
+ * GET - Retrieve user's habits
+ *
+ * Fetches all habits belonging to the authenticated user.
+ * Habits are ordered by creation date (newest first).
+ *
+ * @returns Promise<NextResponse> - Success response with habits array or error
+ */
 export async function GET() {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -70,6 +96,7 @@ export async function GET() {
 
     const pool = getPool();
 
+    // Fetch all habits for the user
     const selectQuery = `
       SELECT * FROM habits
       WHERE user_id = $1
@@ -87,15 +114,25 @@ export async function GET() {
   }
 }
 
-// Handle DELETE request to remove a habit
+/**
+ * DELETE - Remove a habit
+ *
+ * Deletes a specific habit belonging to the authenticated user.
+ * Uses query parameter 'id' to identify the habit to delete.
+ *
+ * @param request - Next.js request object with habit ID in query params
+ * @returns Promise<NextResponse> - Success confirmation or error
+ */
 export async function DELETE(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Extract habit ID from query parameters
     const { searchParams } = new URL(request.url);
     const habitId = searchParams.get('id');
 
@@ -105,7 +142,7 @@ export async function DELETE(request: NextRequest) {
 
     const pool = getPool();
 
-    // Delete the habit, ensuring it belongs to the user
+    // Delete habit (ensures user owns the habit for security)
     const deleteQuery = `
       DELETE FROM habits
       WHERE id = $1 AND user_id = $2
@@ -121,15 +158,25 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// Handle PUT request to update a habit
+/**
+ * PUT - Update a habit
+ *
+ * Updates an existing habit's title and description.
+ * Requires habit ID and ensures user owns the habit.
+ *
+ * @param request - Next.js request object with updated habit data
+ * @returns Promise<NextResponse> - Success response with updated habit or error
+ */
 export async function PUT(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Parse form data
     const formData = await request.formData();
     const habitId = formData.get("id") as string;
     const title = formData.get("title") as string;
@@ -141,7 +188,7 @@ export async function PUT(request: NextRequest) {
 
     const pool = getPool();
 
-    // Update the habit, ensuring it belongs to the user
+    // Update habit (ensures user owns the habit for security)
     const updateQuery = `
       UPDATE habits
       SET title = $1, description = $2

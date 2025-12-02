@@ -1,26 +1,46 @@
+/**
+ * Global Styles and Design System
+ *
+ * This file contains the global CSS styles, design tokens, and component styles
+ * for the ShowUp habit tracking application. Uses Tailwind CSS as the base framework
+ * with custom design tokens for the glassmorphism aesthetic.
+ *
+ * Design Philosophy:
+ * - Glassmorphism: Semi-transparent surfaces with blur effects
+ * - Apple-inspired color palette: Warm, natural colors
+ * - Consistent spacing and typography system
+ * - Responsive design with mobile-first approach
+ */
+
 @import "tailwindcss";
 
+/**
+ * CSS Custom Properties (Design Tokens)
+ *
+ * Defines the core design tokens used throughout the application.
+ * These variables control colors, spacing, typography, and visual effects.
+ */
 :root {
   /* Apple-inspired color palette */
-  --background: #626554;
-  --surface: #ffffff2c;
- --surface-secondary: #f8f9fa41;
-  --text-primary: #1d1d1f;
-  --text-secondary: #0c0c0c;
-  --text-tertiary: #19191b;
-  --accent: #007bff36;
-  --accent-hover: #0055cc3f;
-  --success: #34c75944;
-  --warning: #ff950023;
-  --error: #ff3a3052;
-  --border: rgba(0, 0, 0, 0.1);
+  --background: #626554;           /* Warm green background */
+  --surface: #ffffff2c;            /* Semi-transparent white surfaces */
+ --surface-secondary: #f8f9fa41;  /* Secondary surface color */
+  --text-primary: #1d1d1f;         /* Primary text color */
+  --text-secondary: #0c0c0c;       /* Secondary text color */
+  --text-tertiary: #19191b;        /* Tertiary text color */
+  --accent: #007bff36;             /* Accent color for links/buttons */
+  --accent-hover: #0055cc3f;       /* Hover state for accent */
+  --success: #34c75944;            /* Success state color */
+  --warning: #ff950023;            /* Warning state color */
+  --error: #ff3a3052;              /* Error state color */
+  --border: rgba(0, 0, 0, 0.1);   /* Border color */
 
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.26);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  /* Glassmorphism effects */
+  --glass-bg: rgba(255, 255, 255, 0.26);     /* Glass background */
+  --glass-border: rgba(255, 255, 255, 0.2);  /* Glass border */
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Glass shadow */
 
-  /* Spacing */
+  /* Spacing scale */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -28,7 +48,7 @@
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
 
-  /* Border radius */
+  /* Border radius scale */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -39,7 +59,7 @@
   --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
   --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 
-  /* Shadows */
+  /* Shadow scale */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);

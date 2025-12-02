@@ -1,15 +1,39 @@
+/**
+ * Food Items API Route Handler
+ *
+ * RESTful API endpoints for managing user food items database.
+ * Supports creating and retrieving food items with comprehensive nutritional information.
+ * All endpoints require user authentication.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "../../db";
 import { authenticateUser } from "../../utils/auth";
 
+/**
+ * POST - Create a new food item
+ *
+ * Adds a new food item to the user's personal food database with complete nutritional information.
+ * Accepts both JSON and FormData formats for flexibility with different client implementations.
+ *
+ * Nutritional fields include:
+ * - Basic info: name, serving size, calories
+ * - Macronutrients: protein, fats (total, saturated, trans), carbohydrates, fiber, sugars
+ * - Micronutrients: vitamins (D), minerals (calcium, iron, potassium), sodium, cholesterol
+ *
+ * @param request - Next.js request object containing food item data
+ * @returns Promise<NextResponse> - Success response with created food item or error
+ */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Initialize nutritional data variables
     let name: string;
     let serving_size: string;
     let calories: number;
@@ -28,9 +52,10 @@ export async function POST(request: NextRequest) {
     let iron: number;
     let potassium: number;
 
-    // Check if request is JSON or form data
+    // Handle both JSON and FormData request formats
     const contentType = request.headers.get('content-type');
     if (contentType?.includes('application/json')) {
+      // Parse JSON request body
       const jsonData = await request.json();
       name = jsonData.name;
       serving_size = jsonData.serving_size || '1 serving';
@@ -50,6 +75,7 @@ export async function POST(request: NextRequest) {
       iron = jsonData.iron || 0;
       potassium = jsonData.potassium || 0;
     } else {
+      // Parse FormData request body
       const formData = await request.formData();
       name = formData.get("name") as string;
       serving_size = formData.get("serving_size") as string || '1 serving';
@@ -70,13 +96,14 @@ export async function POST(request: NextRequest) {
       potassium = parseFloat(formData.get("potassium") as string) || 0;
     }
 
+    // Validate required fields
     if (!name?.trim()) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
     const pool = getPool();
 
-    // Insert the food item into the database
+    // Insert new food item into database with all nutritional data
     const insertQuery = `
       INSERT INTO food (user_id, name, serving_size, calories, protein, total_fat, saturated_fat, trans_fat, cholesterol, sodium, total_carbohydrate, dietary_fiber, total_sugars, added_sugars, vitamin_d, calcium, iron, potassium)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18) RETURNING *
@@ -98,9 +125,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Handle GET request to fetch food items for the user
+/**
+ * GET - Retrieve user's food items
+ *
+ * Fetches all food items belonging to the authenticated user.
+ * Food items are ordered by creation date (newest first).
+ *
+ * @returns Promise<NextResponse> - Success response with food items array or error
+ */
 export async function GET() {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
@@ -109,6 +144,7 @@ export async function GET() {
 
     const pool = getPool();
 
+    // Fetch all food items for the user
     const selectQuery = `
       SELECT * FROM food
       WHERE user_id = $1

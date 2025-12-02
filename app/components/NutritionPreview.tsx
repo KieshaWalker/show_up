@@ -1,8 +1,26 @@
+/**
+ * Nutrition Preview Dashboard Component
+ *
+ * Main dashboard component displaying user's nutrition tracking with food logging,
+ * calorie counting, and quick-add functionality. Shows today's nutrition summary
+ * and provides easy access to food consumption logging.
+ *
+ * Features:
+ * - Today's calorie summary with visual display
+ * - Quick-add food functionality with searchable food database
+ * - Recent food consumption logs
+ * - Integration with nutrition API for logging and retrieval
+ * - Responsive design with mobile-friendly interactions
+ */
+
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
+/**
+ * Food item data structure from user's personal food database
+ */
 interface FoodItem {
   id: number;
   name: string;
@@ -13,6 +31,9 @@ interface FoodItem {
   created_at: string;
 }
 
+/**
+ * Nutrition log entry structure with food details
+ */
 interface NutritionLog {
   id: number;
   food_id: number;
@@ -22,21 +43,45 @@ interface NutritionLog {
   calories: number;
 }
 
+/**
+ * NutritionPreview Component
+ *
+ * Displays a comprehensive nutrition dashboard with food logging capabilities.
+ * Fetches food items and today's nutrition logs on mount for immediate display.
+ * Provides interactive food selection and quantity logging.
+ *
+ * @returns {JSX.Element} Nutrition preview dashboard
+ */
 export default function NutritionPreview() {
+  // Food database state
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+
+  // Today's nutrition logs
   const [nutritionLogs, setNutritionLogs] = useState<NutritionLog[]>([]);
+
+  // UI state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [quickAddName, setQuickAddName] = useState('');
+
+  // Food logging state
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
   const [quantity, setQuantity] = useState(1);
 
+  /**
+   * Initialize component data on mount
+   * Fetches food items and today's nutrition logs
+   */
   useEffect(() => {
     fetchFoodItems();
     fetchTodayLogs();
   }, []);
 
+  /**
+   * Fetch user's food items from personal database
+   * Updates loading state and handles errors
+   */
   const fetchFoodItems = async () => {
     try {
       setLoading(true);
@@ -57,6 +102,10 @@ export default function NutritionPreview() {
     }
   };
 
+  /**
+   * Fetch today's nutrition logs
+   * Retrieves all food consumption entries for the current date
+   */
   const fetchTodayLogs = async () => {
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -71,6 +120,12 @@ export default function NutritionPreview() {
     }
   };
 
+  /**
+   * Log food consumption for today
+   * Records food intake and refreshes today's logs
+   * @param foodId - ID of the food item being logged
+   * @param quantity - Quantity consumed (default: 1)
+   */
   const logFoodConsumption = async (foodId: number, quantity: number = 1) => {
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -98,6 +153,11 @@ export default function NutritionPreview() {
     }
   };
 
+  /**
+   * Handle quick-add food form submission
+   * Creates new food item and refreshes the food list
+   * @param e - Form submission event
+   */
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickAddName.trim()) return;
@@ -144,10 +204,16 @@ export default function NutritionPreview() {
     }
   };
 
+  /**
+   * Calculate total calories consumed today
+   * Sums up calories from all logged food items
+   * @returns Total calories for the day
+   */
   const getTodayCalories = () => {
     return nutritionLogs.reduce((total, log) => total + (log.calories * log.quantity), 0);
   };
 
+  // Loading state - show spinner while fetching data
   if (loading) {
     return (
       <div className="glass-card nutrition-preview">
@@ -157,6 +223,7 @@ export default function NutritionPreview() {
     );
   }
 
+  // Error state - display error message and link to full nutrition page
   if (error) {
     return (
       <div className="glass-card nutrition-preview">
@@ -171,6 +238,7 @@ export default function NutritionPreview() {
 
   return (
     <div className="glass-card nutrition-preview">
+      {/* Header section with title and action buttons */}
       <div className="preview-header">
         <h3 className="preview-title">Your Nutrition</h3>
         <div className="flex gap-2">
@@ -186,12 +254,13 @@ export default function NutritionPreview() {
         </div>
       </div>
 
-      {/* Today's Calories Summary */}
+      {/* Daily calorie summary display */}
       <div className="calories-summary">
         <div className="calories-number">{getTodayCalories()}</div>
         <div className="calories-label">calories today</div>
       </div>
 
+      {/* Quick add food form - conditionally rendered */}
       {showQuickAdd && (
         <div className="mb-4 p-3 bg-surface-secondary rounded-md">
           <form onSubmit={handleQuickAdd} className="flex gap-2">
@@ -220,7 +289,7 @@ export default function NutritionPreview() {
         </div>
       )}
 
-      {/* Today's Food Log */}
+      {/* Today's food consumption log - shows recent items */}
       {nutritionLogs.length > 0 && (
         <div className="food-log">
           <h4 className="food-log-title">Today's Foods</h4>
@@ -240,7 +309,7 @@ export default function NutritionPreview() {
         </div>
       )}
 
-      {/* Quick Food Selection */}
+      {/* Quick food selection grid - buttons for common foods */}
       {foodItems.length > 0 && (
         <div>
           <h4 className="text-sm font-semibold mb-2">Quick Add Food</h4>
@@ -264,6 +333,7 @@ export default function NutritionPreview() {
         </div>
       )}
 
+      {/* Empty state - shown when no food items exist */}
       {foodItems.length === 0 && !showQuickAdd && (
         <div className="empty-state">
           <p>No food items yet. Start tracking your nutrition!</p>

@@ -1,8 +1,26 @@
+/**
+ * Habits Preview Dashboard Component
+ *
+ * Main dashboard component displaying user's habits with completion tracking,
+ * progress visualization, and smart food suggestions. Provides quick-add functionality
+ * and integrates with both habit and nutrition tracking systems.
+ *
+ * Features:
+ * - Progress bar showing daily habit completion percentage
+ * - Suggestion card recommending frequently-used foods when habits are incomplete
+ * - Quick-add form for creating new habits
+ * - Real-time habit completion toggling
+ * - Responsive design with mobile-friendly interactions
+ */
+
 "use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
+/**
+ * Habit data structure
+ */
 interface Habit {
   id: number;
   title: string;
@@ -11,6 +29,9 @@ interface Habit {
   frequency?: string;
 }
 
+/**
+ * Habit log entry structure
+ */
 interface HabitLog {
   id: number;
   habit_id: number;
@@ -18,23 +39,47 @@ interface HabitLog {
   date: string;
 }
 
+/**
+ * HabitsPreview Component
+ *
+ * Displays a comprehensive habits dashboard with progress tracking and smart suggestions.
+ * Fetches habit data, today's logs, and food usage statistics on mount.
+ * Provides interactive habit completion and quick-add functionality.
+ *
+ * @returns {JSX.Element} Habits preview dashboard
+ */
 export default function HabitsPreview() {
+  // Food usage statistics for smart suggestions
   const [foodUsageStats, setFoodUsageStats] = useState<Array<{id: number, name: string, count: number, calories: number}>>([]);
+
+  // Progress tracking state
   const [totalHabits, setTotalHabits] = useState(0);
   const [completedToday, setCompletedToday] = useState(0);
+
+  // Core data state
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
+
+  // UI state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [quickAddTitle, setQuickAddTitle] = useState('');
 
+  /**
+   * Initialize component data on mount
+   * Fetches habits, today's logs, and food usage statistics
+   */
   useEffect(() => {
     fetchHabits();
     fetchTodayLogs();
     fetchFoodUsageStats();
   }, []);
 
+  /**
+   * Fetch user's habits from API
+   * Updates loading state and handles errors
+   */
   const fetchHabits = async () => {
     try {
       setLoading(true);
@@ -106,6 +151,12 @@ export default function HabitsPreview() {
     }
   };
 
+  /**
+   * Log habit completion for today
+   * Updates or creates habit log entry via API
+   * @param habitId - ID of the habit to log
+   * @param completed - Whether the habit was completed
+   */
   const logHabitCompletion = async (habitId: number, completed: boolean) => {
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -131,10 +182,21 @@ export default function HabitsPreview() {
     }
   };
 
+  /**
+   * Check if a specific habit is completed today
+   * @param habitId - ID of the habit to check
+   * @returns boolean indicating completion status
+   */
   const isHabitCompletedToday = (habitId: number) => {
     return habitLogs.some(log => log.habit_id === habitId && log.completed);
   };
 
+  /**
+   * Log food consumption from suggestion card
+   * Adds nutrition entry and refreshes usage statistics
+   * @param foodId - ID of the food item to log
+   * @param quantity - Quantity consumed (default: 1)
+   */
   const logFoodConsumption = async (foodId: number, quantity: number = 1) => {
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -161,6 +223,11 @@ export default function HabitsPreview() {
     }
   };
 
+  /**
+   * Handle quick-add habit form submission
+   * Creates new habit and refreshes the habits list
+   * @param e - Form submission event
+   */
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickAddTitle.trim()) return;
@@ -228,7 +295,7 @@ export default function HabitsPreview() {
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar - Shows daily completion percentage */}
       {totalHabits > 0 && (
         <div className="progress-section">
           <div className="progress-header">
@@ -244,7 +311,7 @@ export default function HabitsPreview() {
         </div>
       )}
 
-      {/* Suggestion Card */}
+      {/* Suggestion Card - Appears when habits are incomplete and food data exists */}
       {totalHabits > 0 && completedToday < totalHabits && foodUsageStats.length > 0 && (
         <div className="suggestion-card">
           <h4 className="suggestion-title">💡 Complete {totalHabits - completedToday} more habit{totalHabits - completedToday !== 1 ? 's' : ''}!</h4>
@@ -265,6 +332,7 @@ export default function HabitsPreview() {
         </div>
       )}
 
+      {/* Quick Add Form - Toggleable form for creating new habits */}
       {showQuickAdd && (
         <div className="mb-4 p-3 bg-surface-secondary rounded-md">
           <form onSubmit={handleQuickAdd} className="flex gap-2">

@@ -1,17 +1,37 @@
+/**
+ * Habit Logs API Route Handler
+ *
+ * API endpoints for managing habit completion logs.
+ * Supports logging habit completions and retrieving habit log history.
+ * All endpoints require user authentication.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "../../../db";
 import { authenticateUser } from "../../../utils/auth";
 
+/**
+ * POST - Log habit completion
+ *
+ * Records or updates a habit completion log entry for a specific date.
+ * Uses upsert logic to handle both new entries and updates to existing ones.
+ *
+ * @param request - Next.js request object with habit log data (habitId, date, completed, notes)
+ * @returns Promise<NextResponse> - Success response with logged habit data or error
+ */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Parse request body
     const { habitId, date, completed, notes } = await request.json();
 
+    // Validate required fields
     if (!habitId || !date) {
       return NextResponse.json(
         { error: "habitId and date are required" },
@@ -21,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     const pool = getPool();
 
-    // Check if habit belongs to user
+    // Security check: Ensure habit belongs to authenticated user
     const habitCheck = await pool.query(
       "SELECT id FROM habits WHERE id = $1 AND user_id = $2",
       [habitId, user.id]
@@ -34,7 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert or update habit log
+    // Insert or update habit log using PostgreSQL upsert
     const query = `
       INSERT INTO habit_logs (habit_id, user_id, date, completed, notes)
       VALUES ($1, $2, $3, $4, $5)
@@ -68,20 +88,36 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * GET - Retrieve habit logs
+ *
+ * Fetches habit log entries with optional filtering by habit ID and/or date.
+ * Includes habit details (title, description) in the response.
+ *
+ * Query Parameters:
+ * - habitId: Filter logs for a specific habit
+ * - date: Filter logs for a specific date
+ *
+ * @param request - Next.js request object with optional query parameters
+ * @returns Promise<NextResponse> - Success response with habit logs array or error
+ */
 export async function GET(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Extract query parameters
     const { searchParams } = new URL(request.url);
     const habitId = searchParams.get('habitId');
     const date = searchParams.get('date');
 
     const pool = getPool();
 
+    // Build dynamic query with optional filters
     let query = `
       SELECT hl.*, h.title, h.description
       FROM habit_logs hl
@@ -90,16 +126,19 @@ export async function GET(request: NextRequest) {
     `;
     const params = [user.id];
 
+    // Add habit ID filter if provided
     if (habitId) {
       query += " AND hl.habit_id = $2";
       params.push(habitId);
     }
 
+    // Add date filter if provided
     if (date) {
       query += ` AND hl.date = $${params.length + 1}`;
       params.push(date);
     }
 
+    // Order by date (newest first) and habit title
     query += " ORDER BY hl.date DESC, h.title";
 
     const result = await pool.query(query, params);

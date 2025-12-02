@@ -1,17 +1,37 @@
+/**
+ * Nutrition Logs API Route Handler
+ *
+ * API endpoints for managing nutrition consumption logs.
+ * Supports logging food consumption, retrieving nutrition history, and deleting logs.
+ * All endpoints require user authentication.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "../../../db";
 import { authenticateUser } from "../../../utils/auth";
 
+/**
+ * POST - Log food consumption
+ *
+ * Records a food consumption entry for tracking nutritional intake.
+ * Links to existing food items and includes quantity and optional notes.
+ *
+ * @param request - Next.js request object with nutrition log data (foodId, date, quantity, notes)
+ * @returns Promise<NextResponse> - Success response with logged nutrition data or error
+ */
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Parse request body
     const { foodId, date, quantity, notes } = await request.json();
 
+    // Validate required fields
     if (!foodId || !date) {
       return NextResponse.json(
         { error: "foodId and date are required" },
@@ -21,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     const pool = getPool();
 
-    // Check if food item belongs to user
+    // Security check: Ensure food item belongs to authenticated user
     const foodCheck = await pool.query(
       "SELECT id FROM food WHERE id = $1 AND user_id = $2",
       [foodId, user.id]
@@ -34,7 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert nutrition log
+    // Insert nutrition log entry
     const query = `
       INSERT INTO nutrition_logs (food_id, user_id, date, quantity, notes)
       VALUES ($1, $2, $3, $4, $5)
@@ -49,7 +69,7 @@ export async function POST(request: NextRequest) {
       notes || null
     ]);
 
-    // Get the full food details for the response
+    // Fetch complete nutrition log with food details for response
     const foodDetailsQuery = `
       SELECT nl.*, f.name, f.calories, f.serving_size, f.protein, f.total_fat, f.total_carbohydrate
       FROM nutrition_logs nl
@@ -73,20 +93,36 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * GET - Retrieve nutrition logs
+ *
+ * Fetches nutrition log entries with optional filtering by food ID and/or date.
+ * Includes food details (name, calories, macros) in the response for complete tracking.
+ *
+ * Query Parameters:
+ * - foodId: Filter logs for a specific food item
+ * - date: Filter logs for a specific date
+ *
+ * @param request - Next.js request object with optional query parameters
+ * @returns Promise<NextResponse> - Success response with nutrition logs array or error
+ */
 export async function GET(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Extract query parameters
     const { searchParams } = new URL(request.url);
     const foodId = searchParams.get('foodId');
     const date = searchParams.get('date');
 
     const pool = getPool();
 
+    // Build dynamic query with optional filters and food details
     let query = `
       SELECT nl.*, f.name, f.calories, f.serving_size, f.protein, f.total_fat, f.total_carbohydrate
       FROM nutrition_logs nl
@@ -95,16 +131,19 @@ export async function GET(request: NextRequest) {
     `;
     const params = [user.id];
 
+    // Add food ID filter if provided
     if (foodId) {
       query += " AND nl.food_id = $2";
       params.push(foodId);
     }
 
+    // Add date filter if provided
     if (date) {
       query += ` AND nl.date = $${params.length + 1}`;
       params.push(date);
     }
 
+    // Order by date (newest first) and food name
     query += " ORDER BY nl.date DESC, f.name";
 
     const result = await pool.query(query, params);
@@ -120,14 +159,26 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * DELETE - Remove a nutrition log entry
+ *
+ * Deletes a specific nutrition log entry.
+ * Uses query parameter 'id' to identify the log entry to delete.
+ * Database constraints ensure only the log owner can delete their entries.
+ *
+ * @param request - Next.js request object with log ID in query params
+ * @returns Promise<NextResponse> - Success confirmation or error
+ */
 export async function DELETE(request: NextRequest) {
   try {
+    // Authenticate user
     const authResult = await authenticateUser();
     if (authResult instanceof NextResponse) {
       return authResult;
     }
     const user = authResult;
 
+    // Extract log ID from query parameters
     const { searchParams } = new URL(request.url);
     const logId = searchParams.get('id');
 
@@ -140,7 +191,7 @@ export async function DELETE(request: NextRequest) {
 
     const pool = getPool();
 
-    // Delete the log (will only succeed if it belongs to the user due to foreign key constraints)
+    // Delete nutrition log (user ownership verified by foreign key constraints)
     const result = await pool.query(
       "DELETE FROM nutrition_logs WHERE id = $1 AND user_id = $2 RETURNING *",
       [logId, user.id]
