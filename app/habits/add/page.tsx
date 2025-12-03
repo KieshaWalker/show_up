@@ -2,8 +2,6 @@
 import React from "react";
 import {} from "@stackframe/stack";
 
-import { handleHabitRequest } from "../handler";
-
 export default async function AddHabit() {
   return (
     <div className="add-habit-container">

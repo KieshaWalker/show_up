@@ -1,7 +1,8 @@
 
 
-// app/api/calendar/dashboard/route.ts
+// app/api/calendar/dashboard/page.tsx
 import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import { authenticateUser } from "@/app/utils/auth";
 import { getPool } from "../../../db";
 
@@ -9,9 +10,12 @@ import { getPool } from "../../../db";
 export default async function DashboardPage() {
     // Authenticate user
     const authResult = await authenticateUser();
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
+        if (authResult instanceof NextResponse) {
+            if (authResult.status === 401) {
+                redirect("/login");
+            }
+            throw new Error("Failed to authenticate user");
+        }
     const user = authResult;
     
     const pool = getPool();
