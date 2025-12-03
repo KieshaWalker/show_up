@@ -29,7 +29,6 @@ interface NutritionLog {
   food_id: number;
   quantity: number;
   date: string;
-  notes?: string;
   name: string;
   calories: number;
   serving_size: string;
@@ -77,7 +76,7 @@ export default function NutritionPage() {
     }
   };
 
-  const logNutrition = async (foodId: number, quantity: number, notes?: string) => {
+  const logNutrition = async (foodId: number, quantity: number) => {
     try {
       const today = new Date().toISOString().split('T')[0];
       const response = await fetch('/api/nutrition/log', {
@@ -89,7 +88,6 @@ export default function NutritionPage() {
           foodId,
           date: today,
           quantity,
-          notes,
         }),
       });
 
@@ -268,15 +266,14 @@ function LogNutritionModal({
   onCancel
 }: {
   food: FoodItem;
-  onSave: (foodId: number, quantity: number, notes?: string) => void;
+  onSave: (foodId: number, quantity: number) => void;
   onCancel: () => void;
 }) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const quantity = parseFloat(formData.get('quantity') as string) || 1;
-    const notes = formData.get('notes') as string;
-    onSave(food.id, quantity, notes);
+    onSave(food.id, quantity);
   };
 
   return (
@@ -297,15 +294,7 @@ function LogNutritionModal({
             />
           </label>
 
-          <label>
-            Notes (optional):
-            <textarea
-              className="label-input"
-              name="notes"
-              rows={3}
-              placeholder="Any additional notes..."
-            />
-          </label>
+    
 
           <div className="modal-actions">
             <button type="button" onClick={onCancel} className="glass-button cancel-btn">

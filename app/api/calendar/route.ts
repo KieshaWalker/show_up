@@ -114,7 +114,6 @@ export async function GET(request: NextRequest) {
         id: habit.id,
         title: habit.title,
         completed: habit.completed,
-        notes: habit.notes,
         date: habit.date
       });
     });
@@ -135,7 +134,6 @@ export async function GET(request: NextRequest) {
         calories: entry.calories,
         quantity: entry.quantity,
         serving_size: entry.serving_size,
-        notes: entry.notes,
         date: entry.date
       });
     });

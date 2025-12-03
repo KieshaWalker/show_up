@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const user = authResult;
 
     // Parse request body
-    const { habitId, date, completed, notes } = await request.json();
+    const { habitId, date, completed } = await request.json();
 
     // Validate required fields
     if (!habitId || !date) {
@@ -56,12 +56,11 @@ export async function POST(request: NextRequest) {
 
     // Insert or update habit log using PostgreSQL upsert
     const query = `
-      INSERT INTO habit_logs (habit_id, user_id, date, completed, notes)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO habit_logs (habit_id, user_id, date, completed)
+      VALUES ($1, $2, $3, $4)
       ON CONFLICT (habit_id, date)
       DO UPDATE SET
         completed = EXCLUDED.completed,
-        notes = EXCLUDED.notes,
         updated_at = CURRENT_TIMESTAMP
       RETURNING *
     `;
@@ -70,8 +69,7 @@ export async function POST(request: NextRequest) {
       habitId,
       user.id,
       date,
-      completed || false,
-      notes || null
+      completed || false
     ]);
 
     return NextResponse.json({

@@ -20,15 +20,18 @@ export default async function DashboardPage() {
     
     const pool = getPool();
 
-    // Get today's date in YYYY-MM-DD format
+    // Helper to get a YYYY-MM-DD key in UTC regardless of server timezone
+    const toDateKey = (value: Date | string | number) => {
+        const date = new Date(value);
+        return date.toISOString().split('T')[0];
+    };
+
+    // Get today's and yesterday's date keys in UTC to avoid timezone drift
     const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const todayStr = toDateKey(today);
     const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    const yesterdayStr = toDateKey(yesterday);
 
     
     // Fetch today's habit logs with habit names
@@ -42,157 +45,162 @@ export default async function DashboardPage() {
     const habitLogs = habitLogsResult.rows;
 
     // Convert database dates to YYYY-MM-DD format for comparison
-    const todayHabits = habitLogs.filter(log => {
-        const logDate = new Date(log.date);
-        const logDateStr = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}-${String(logDate.getDate()).padStart(2, '0')}`;
-        return logDateStr === todayStr && log.completed;
-    });
-    const yesterdayHabits = habitLogs.filter(log => {
-        const logDate = new Date(log.date);
-        const logDateStr = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}-${String(logDate.getDate()).padStart(2, '0')}`;
-        return logDateStr === yesterdayStr && log.completed;
-    });
- console.log("Today's Habits:", todayHabits);
- console.log("Yesterday's Habits:", yesterdayHabits);
-
- const showHabitsAndLogDates = habitLogs.map(log => {
-    const logDate = new Date(log.date);
-    const logDateStr = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}-${String(logDate.getDate()).padStart(2, '0')}`;
-    return {
-        habit_id: log.habit_id,
-        title: log.title,
-        date: logDateStr,
-        completed: log.completed
-    };
- });
- console.log("All Habits and Log Dates:", showHabitsAndLogDates);
+    const todayHabits = habitLogs.filter(log => toDateKey(log.date) === todayStr && log.completed);
+    const yesterdayHabits = habitLogs.filter(log => toDateKey(log.date) === yesterdayStr && log.completed);
 
     // Fetch today's nutrition logs
-    const nutritionLogsQuery = `
-      SELECT nl.id, nl.date, nl.quantity, f.name AS food_name
+        const todayNutritionLogsQuery = `
+            SELECT nl.id, nl.date, nl.quantity, nl.meal_type, nl.calories, f.name, f.serving_size AS food_serving_size
       FROM nutrition_logs nl
       JOIN food f ON nl.food_id = f.id
       WHERE nl.user_id = $1 AND nl.date = $2
-    `;
-    const nutritionLogsResult = await pool.query(nutritionLogsQuery, [user.id, todayStr]);
-    const nutritionLogs = nutritionLogsResult.rows;
+    `; 
+    // explanation of line 61 - we are fetching nutrition logs for the authenticated user for today's date only
+    // explanation of line 62 - we are joining the food table to get food details like name, calories, and serving size
+    // explanation of line 63 - we are filtering the nutrition logs by user_id and date to get only today's entries for the authenticated user//
+    // explanation of line 64 - we are using parameterized queries to prevent SQL injection attacks
+
+    
+        const nutritionLogsResult = await pool.query(todayNutritionLogsQuery, [user.id, todayStr]);
+        const nutritionLogs = nutritionLogsResult.rows;
+
+        // Fetch last 7 days of nutrition logs for weekly trends (including yesterday)
+        const weeklyNutritionLogsQuery = `
+            SELECT nl.id, nl.date, nl.quantity, nl.meal_type, nl.calories, f.name, f.serving_size AS food_serving_size
+            FROM nutrition_logs nl
+            JOIN food f ON nl.food_id = f.id
+            WHERE nl.user_id = $1
+                AND nl.date BETWEEN ($2::date - INTERVAL '6 days') AND $2::date
+            ORDER BY nl.date DESC
+        `;
+        const weeklyNutritionResult = await pool.query(weeklyNutritionLogsQuery, [user.id, todayStr]);
+        const weeklyNutrition = weeklyNutritionResult.rows;
+        const weeklyCalories = weeklyNutrition.reduce((sum, log) => sum + (log.calories || 0), 0);
+        const weeklyNutritionName = weeklyNutrition.map(log => log.name);
+        const dateEaten = weeklyNutrition.map(log => toDateKey(log.date));
+
+
+        console.log("Weekly Dates Eaten:", dateEaten);
+        console.log("Weekly cals:", weeklyCalories);
+        console.log("Weekly Nutrition Names:", weeklyNutritionName);
+        console.log("Weekly Nutrition:", weeklyNutrition);
+
 
     // Calculate summary statistics
     const totalHabitsCompletedToday = habitLogs.filter(log => {
         try {
-            // find habits completed that match the same day as todayStr
-            const logDate = new Date(log.date);
-            const logDateStr = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}-${String(logDate.getDate()).padStart(2, '0')}`;
-            return log.completed && logDateStr === todayStr;
+            return log.completed && toDateKey(log.date) === todayStr;
         } catch (error) {
             console.error("Error parsing date for habit log:", log, error);
             return false;
         }
     });
 
-     console.log("Total Habits Completed Today:", totalHabitsCompletedToday.length);
 
     const totalNutritionEntries = nutritionLogs.length;
     const totalCaloriesConsumed = nutritionLogs.reduce((sum, log) => sum + (log.calories || 0), 0);
     const totalProteinConsumed = nutritionLogs.reduce((sum, log) => sum + (log.protein || 0), 0);
     const totalFatConsumed = nutritionLogs.reduce((sum, log) => sum + (log.total_fat || 0), 0);
-    const totalCarbsConsumed = nutritionLogs.reduce((sum, log) => sum + (log.total_carbohydrate || 0), 0);
-
-    const totalHabitsUncompleted = habitLogs.filter(log => !log.completed).length;
+    const totalCarbsConsumed = nutritionLogs.reduce((sum, log) => sum + (log.total_carbohydrate || 0), 0); 
 
 
-    // Construct response data
-    const responseData = {
-      date: todayStr,
-      habits: habitLogs,
-      nutrition: nutritionLogs,
-      summary: {
-        totalHabitsCompletedToday,
-        totalNutritionEntries,
-        totalCaloriesConsumed
-      }
+
+    // (weeklyNutrition already computed via query)
+
+    const getCaloriesOverTimeTotal = (weeklyNutrition: any[]) => {
+        // Aggregate calories by date
+        const caloriesMap: { [key: string]: number } = {};
+    
+        weeklyNutrition.forEach(log => {
+            const dateKey = toDateKey(log.date);
+            // Initialize if not present
+            if (!caloriesMap[dateKey]) {
+                caloriesMap[dateKey] = 0;
+            }
+            caloriesMap[dateKey] += log.calories || 0;
+            // Sum calories for the date
+        });
+    
+        return Object.keys(caloriesMap).map(date => ({
+            date,
+            calories: caloriesMap[date]
+        }));
     };
 
-    const weeklyHabits = habitLogs.filter(log => {
-        const logDate = new Date(log.date);
-        const diffTime = Math.abs(today.getTime() - logDate.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays <= 7;
-    }); 
 
-    console.log("Weekly Habits:", weeklyHabits);
+    const getCaloriesYesterdayTotal = (nutritionLogs: any[]) => {
+        // Sum calories for yesterday
+        return nutritionLogs
+            .filter(log => toDateKey(log.date) === yesterdayStr)
+            .reduce((sum, log) => sum + (log.calories || 0), 0);
+    };
 
+    const caloriesOverTimeTotal = getCaloriesOverTimeTotal(weeklyNutrition);
+    const caloriesYesterdayTotal = getCaloriesYesterdayTotal(weeklyNutrition);
 
-    const weeklyNutrition = nutritionLogs.filter(log => {
-        const logDate = new Date(log.date);
-        const diffTime = Math.abs(today.getTime() - logDate.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays <= 7;
-    });
-    console.log("Weekly Nutrition:", weeklyNutrition);
-
+    console.log("Calories Over Time Total:", caloriesOverTimeTotal);
+    console.log("Calories Yesterday Total:", caloriesYesterdayTotal);
    
 
 
   return (
     <>
-<div className="test">    
-        <div className="spacer">    </div>
+<div className="db">    
     <div className="dashboard-container">
+    <div className="dashboard-spacing"></div>
 
-      <h1 className="dashboard-title">Today's Overview</h1>
-
-        <div className="summary-cards">
+    <div className="summary-s">
+        {totalHabitsCompletedToday.length > 0 && (
             <div className="summary-card">
-                <h2>Today's Overview - {today.toDateString()}</h2>
-                <p>Habits completed today: {todayHabits.length}</p>
-                <p>Total habits logged: {habitLogs.length}</p>
-            </div>
-            <div className="summary-card">
-                <h2>Yesterday's Overview - {yesterday.toString()}</h2>
-                <p>Habits completed yesterday: {yesterdayHabits.length}</p>
-            </div>
-            <div className="summary-card">
-                <h2>Nutrition Entries</h2>
-                <p>{totalNutritionEntries}</p>
-            </div>
-             
-        </div>
-
-        {/* Display today's completed habits */}
-        {todayHabits.length > 0 && (
-            <div className="habits-section">
-                <h3>Today's Completed Habits</h3>
-                <div className="habits-list">
+                <h3 className="summary-h3">Today's Overview</h3>
+                <div className="summary-list">
+                    <div className="summary-item">
+                        <span className="dashboard-date">{today.toDateString()}</span>
+                    </div>
                     {todayHabits.map((habit) => (
-                        <div key={`${habit.habit_id}-${habit.date}`} className="habit-item">
-                            <span>{habit.title}</span>
-                            <span className="completed-check">✓</span>
+                        <div key={`${habit.habit_id}-${habit.date}`} className="summary-item">
+                            <span className="habits-completed-today">{habit.title}</span>
                         </div>
                     ))}
                 </div>
-                 
+            </div>
+        )}
+        {nutritionLogs.length > 0 && (
+            <div className="summary-card">
+                <h3 className="summary-h3">Today's Nutrition Entries</h3>
+                <div className="summary-list">
+                    {nutritionLogs.map((log) => (
+                        <div key={log.id} className="summary-item">
+                            <span className="habits-completed-today">{log.name} - {log.calories} kcal </span>
+                        </div>
+                    ))}
+                </div>
             </div>
         )}
 
-        {/* Display yesterday's completed habits */}
-        {yesterdayHabits.length > 0 && (
-            <div className="habits-section">
-                <h3>Yesterday's Completed Habits</h3>
-                <div className="habits-list">
+        {(yesterdayHabits.length > 0 || caloriesYesterdayTotal > 0) && (
+            <div className="summary-card">
+                <h3 className="summary-h3">Yesterday's Overview</h3>
+                <div className="summary-list">
+                    <div className="summary-item">
+                     <span className="dashboard-date">{yesterday.toDateString()}</span>
+                    </div>
                     {yesterdayHabits.map((habit) => (
-                        <div key={`${habit.habit_id}-${habit.date}`} className="habit-item">
-                            <span>{habit.title}</span>
-                            <span className="completed-check">✓</span>
+                        <div key={`${habit.habit_id}-${habit.date}`} className="summary-item">
+                            <span className="habits-completed-yesterday">{habit.title}</span>
                         </div>
                     ))}
+                    {caloriesYesterdayTotal > 0 && (
+                        <div className="summary-item">
+                            <span className="habits-completed-yesterday">{caloriesYesterdayTotal} kcal</span>
+                        </div>
+                    )}
                 </div>
             </div>
         )}
     </div>
-
-</div>
-
+        </div>
+  </div>
     </>
   );
 }

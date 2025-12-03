@@ -97,7 +97,9 @@ CREATE TABLE IF NOT EXISTS nutrition_logs (
   food_id INTEGER NOT NULL REFERENCES food(id) ON DELETE CASCADE,
   user_id TEXT NOT NULL,
   date DATE NOT NULL,
-  quantity DECIMAL(10,2) DEFAULT 1, -- Number of servings
+  quantity INTEGER NOT NULL,
+  meal_type VARCHAR(50) DEFAULT 'unspecified',
+  calories INTEGER NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   count INTEGER DEFAULT 0
@@ -161,7 +163,6 @@ CREATE TRIGGER update_nutrition_logs_updated_at
 -- for this habit model we will need to create a many-to-one relationship between habits and users
 -- here is the model structure:
 -- Habit: id, user_id, title, frequency, color, icon, is_active, created_at
--- HabitLog: id, habit_id, user_id, date, completed, notes, created_at, updated_at
 
 
 -- here are some additional features to consider:
@@ -222,4 +223,37 @@ INSERT INTO habit_logs (habit_id, user_id, date, completed, completed_on, create
 --   createdAt: log.created_at,   
 
 
---- create
+
+/*
+
+SELECT * FROM nutrition_logs WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f';
+
+*/
+--SELECT * FROM nutrition_logs WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f';
+
+
+---- nutrtion_logs's label 
+ ----- id | food_id |               user_id                |    date    | quantity | meal_type | calories |         created_at         |         updated_at         | count 
+
+
+--SELECT * FROM food WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f';
+--  id |               user_id                | name  | serving_size | calories | protein | total_fat | saturated_fat | trans_fat | cholesterol | sodium | total_carbohydrate | dietary_fiber | total_sugars | added_sugars | vitamin_d | calcium | iron | potassium |        created_at         | count 
+
+
+--SELECT * FROM habits WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f';
+ --id |               user_id                |      title      |    frequency    |  color  |    icon    | is_active |         created_at         | count | custom 
+
+--SELECT * FROM habit_logs WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f';
+ --- id | habit_id |               user_id                |    date    | completed | completed_on |         created_at         |         updated_at         | count 
+
+/*
+ -- insert nutrtion log entry for user id '8d3dc861-b08e-4c12-98d3-02ae483e641f' for food id 1 for yesterday with quantity 2 and calories 500
+ INSERT INTO nutrition_logs (food_id, user_id, date, quantity, meal_type, calories, created_at, updated_at) VALUES
+ (1, '8d3dc861-b08e-4c12-98d3-02ae483e641f', CURRENT_DATE - INTERVAL '1 day', 2, CURRENT_TIMESTAMP, 500, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+*/
+
+ -- select from yesterdays nutrtion logs for user id '8d3dc861-b08e-4c12-98d3-02ae483e641f'
+  SELECT * FROM nutrition_logs WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f' AND date = CURRENT_DATE - INTERVAL '1 day';
+
+  -- select from todays nutrtion logs for user id '8d3dc861-b08e-4c12-98d3-02ae483e641f'
+    SELECT * FROM nutrition_logs WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f' AND date = CURRENT_DATE;

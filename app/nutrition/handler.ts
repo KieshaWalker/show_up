@@ -38,11 +38,9 @@ export async function handleNutritionRequest(req: NextRequest) {
       // Insert the food item into the database
       const insertQuery = `
         INSERT INTO food (
-          user_id, name, serving_size, calories, protein, total_fat,
-          saturated_fat, trans_fat, cholesterol, sodium, total_carbohydrate,
-          dietary_fiber, total_sugars, added_sugars, vitamin_d, calcium, iron, potassium
+           id, user_id, name, serving_size, calories, protein, total_fat, saturated_fat, trans_fat, cholesterol, sodium, total_carbohydrate, dietary_fiber, total_sugars, added_sugars, vitamin_d, calcium, iron, potassium, created_at, count 
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
         ) RETURNING *
       `;
 

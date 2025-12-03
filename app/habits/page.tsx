@@ -15,8 +15,7 @@ interface HabitLog {
   habit_id: number;
   completed: boolean;
   date: string;
-  notes?: string;
-}
+}     
 
 export default function HabitsPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -170,11 +169,11 @@ export default function HabitsPage() {
   }
 
   return (
-    <div className="habits-section">
+    <div className="habit-section">
       <div className="content-container">
         <div className="card">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="page-title">Your Habits</h1>
+            <h1 className="hpage-title">Your Habits</h1>
             <Link href="/habits/add" className="btn btn-primary">
               Add New Habit
             </Link>

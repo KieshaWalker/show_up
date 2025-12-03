@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch today's habit logs
     const habitLogsQuery = `
-      SELECT hl.id, hl.date, hl.completed, hl.notes, h.title
+      SELECT hl.id, hl.date, hl.completed, h.title
       FROM habit_logs hl
       JOIN habits h ON hl.habit_id = h.id
       WHERE hl.user_id = $1 AND hl.date = $2
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch today's nutrition logs
     const nutritionLogsQuery = `
-      SELECT nl.id, nl.date, nl.quantity, nl.serving_size, nl.calories, nl.notes, f.name AS food_name
+      SELECT nl.id, nl.date, nl.quantity, nl.serving_size, nl.calories, f.name AS food_name
       FROM nutrition_logs nl
       JOIN food f ON nl.food_id = f.id
       WHERE nl.user_id = $1 AND nl.date = $2

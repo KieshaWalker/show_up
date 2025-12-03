@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const user = authResult;
 
     // Parse request body
-    const { foodId, date, quantity, notes } = await request.json();
+    const { foodId, date, quantity, mealType } = await request.json();
 
     // Validate required fields
     if (!foodId || !date) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     // Security check: Ensure food item belongs to authenticated user
     const foodCheck = await pool.query(
-      "SELECT id FROM food WHERE id = $1 AND user_id = $2",
+      "SELECT id, calories FROM food WHERE id = $1 AND user_id = $2",
       [foodId, user.id]
     );
 
@@ -56,17 +56,23 @@ export async function POST(request: NextRequest) {
 
     // Insert nutrition log entry
     const query = `
-      INSERT INTO nutrition_logs (food_id, user_id, date, quantity, notes)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO nutrition_logs (food_id, user_id, date, quantity, meal_type, calories)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
+
+    const baseCalories = foodCheck.rows[0].calories || 0;
+    const quantityValue = quantity || 1;
+    const calculatedCalories = baseCalories * quantityValue;
+    const mealTypeValue = mealType || 'unspecified';
 
     const result = await pool.query(query, [
       foodId,
       user.id,
       date,
-      quantity || 1,
-      notes || null
+      quantityValue,
+      mealTypeValue,
+      calculatedCalories,
     ]);
 
     // Fetch complete nutrition log with food details for response
