@@ -6,7 +6,6 @@
  * All endpoints require user authentication.
  */
 
-import { handleHabitRequest } from "@/app/habits/handler";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { getPool } from "../../db";
@@ -37,24 +36,17 @@ export async function POST(request: NextRequest) {
     const pool = getPool();
 
     let title: string;
-    let description: string;
-    let frequency: string;
-    let color = 'blue';
-    let icon = 'star';
-    let is_active = true;
-
+    let frequency: string = 'daily';
 
     // Handle both JSON and FormData request formats
     const contentType = request.headers.get('content-type');
     if (contentType?.includes('application/json')) {
       const jsonData = await request.json();
       title = jsonData.title;
-      description = jsonData.description || '';
       frequency = jsonData.frequency || 'daily';
     } else {
       const formData = await request.formData();
       title = formData.get("title") as string;
-      description = formData.get("description") as string || '';
       frequency = formData.get("frequency") as string || 'daily';
     }
 
@@ -65,14 +57,11 @@ export async function POST(request: NextRequest) {
 
     // Insert new habit into database
     const insertQuery = `
-      INSERT INTO habits (user_id, title, description, frequency, color, icon, is_active, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
+      INSERT INTO habits (user_id, title, frequency)
+      VALUES ($1, $2, $3) RETURNING *
     `;
 
-    const values = [user.id, title.trim(), description.trim(), frequency, color, icon, is_active, new Date()];
-
-    const result = await pool.query(insertQuery, values);
-    const newHabit = result.rows[0];
+    await pool.query(insertQuery, [user.id, title.trim(), frequency]);
 
    
     return NextResponse.redirect(new URL('/', request.url));
@@ -168,7 +157,7 @@ export async function DELETE(request: NextRequest) {
 /**
  * PUT - Update a habit
  *
- * Updates an existing habit's title and description.
+ * Updates an existing habit's title.
  * Requires habit ID and ensures user owns the habit.
  *
  * @param request - Next.js request object with updated habit data
@@ -186,11 +175,16 @@ export async function PUT(request: NextRequest) {
     // Parse form data
     const formData = await request.formData();
     const habitId = formData.get("id") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    const rawTitle = formData.get("title");
+    const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
+    const frequency = formData.get("frequency") as string || 'daily';
 
     if (!habitId) {
       return NextResponse.json({ error: "Habit ID required" }, { status: 400 });
+    }
+
+    if (!title) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
 
     const pool = getPool();
@@ -198,12 +192,12 @@ export async function PUT(request: NextRequest) {
     // Update habit (ensures user owns the habit for security)
     const updateQuery = `
       UPDATE habits
-      SET title = $1, description = $2
+      SET title = $1, frequency = $2
       WHERE id = $3 AND user_id = $4
       RETURNING *
     `;
 
-    const values = [title, description, habitId, user.id];
+    const values = [title, frequency, habitId, user.id];
 
     const result = await pool.query(updateQuery, values);
 

@@ -108,6 +108,9 @@ const Navbar: React.FC = () => {
                 <a href="/nutrition" className="nav-link">
                   Nutrition
                 </a>
+                  <a href="/api/calendar/dashboard" className="nav-link">
+                  Dashboard
+                </a>
               </>
             ) : null}
           </div>
@@ -150,6 +153,9 @@ const Navbar: React.FC = () => {
                 </a>
                 <a href="/nutrition" className="mobile-nav-link" onClick={closeMenu}>
                   Nutrition
+                </a>
+                <a href="/api/calendar/dashboard" className="mobile-nav-link" onClick={closeMenu}>
+                  Dashboard
                 </a>
               </>
             ) : null}

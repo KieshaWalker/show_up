@@ -1,10 +1,7 @@
 "use client";
 
-import { handleNutritionRequest } from "./handler";
 import Link from "next/link";
-import AddNutritionPage from "./add/page";
 import React, { useState, useEffect } from "react";
-import { getPool } from "../db";
 
 interface FoodItem {
   id: number;
@@ -136,7 +133,8 @@ export default function NutritionPage() {
     }
   };
 
-  const handleEdit = (item: FoodItem) => {
+  const handleEdit = (itemId: number) => {
+    const item = foodItems.find(item => item.id === itemId) || null;
     setEditingItem(item);
     setShowEditForm(true);
   };
@@ -219,10 +217,10 @@ export default function NutritionPage() {
                         Log
                       </button>
                       <button
-                        onClick={() => handleEdit(food)}
+                        onClick={() => handleEdit(food.id)}
                         className="glass-button action-btn"
                       >
-                        Edit
+                        Edit  
                       </button>
                       <button
                         onClick={() => handleDelete(food.id)}
@@ -249,6 +247,17 @@ export default function NutritionPage() {
           }}
         />
       )}
+
+        {showEditForm && editingItem && (
+          <EditFoodModal
+            item={editingItem}
+            onSave={handleUpdate}
+            onCancel={() => {
+              setShowEditForm(false);
+              setEditingItem(null);
+            }}
+          />
+        )}
     </div>
   );
 }

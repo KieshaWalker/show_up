@@ -37,12 +37,14 @@ export default async function Home() {
   // Check if user is authenticated
   const user = await stackServerApp.getUser();
 
+
+
+
   // Render landing page for unauthenticated users
   if (!user) {
     return (
       <div className="hero-section">
         <div className="hero-content fade-in-up">
-          <h1 className="hero-title">ShowUp</h1>
           <p className="hero-subtitle">
             Build better habits. Transform your life.
           </p>

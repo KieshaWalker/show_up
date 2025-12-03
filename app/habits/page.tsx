@@ -6,8 +6,8 @@ import Link from "next/link";
 interface Habit {
   id: number;
   title: string;
-  description: string;
   created_at: string;
+  frequency: string;
 }
 
 interface HabitLog {
@@ -100,7 +100,7 @@ export default function HabitsPage() {
     }
 
     try {
-      const response = await fetch(`/api/habit?id=${habitId}`, {
+      const response = await fetch(`/api/habits?id=${habitId}`, {
         method: "DELETE",
       });
 
@@ -128,9 +128,9 @@ export default function HabitsPage() {
       const data = new FormData();
       data.append("id", editingHabit.id.toString());
       data.append("title", formData.get("title") as string);
-      data.append("description", formData.get("description") as string);
+      data.append("frequency", formData.get("frequency") as string);
 
-      const response = await fetch(`/api/habit?id=${editingHabit.id}`, {
+      const response = await fetch(`/api/habits`, {
         method: "PUT",
         body: data,
       });
@@ -212,7 +212,6 @@ export default function HabitsPage() {
                     />
                     <h3 className="habit-title">{habit.title}</h3>
                   </div>
-                  <p className="habit-description">{habit.description}</p>
                   <div className="habit-stats">
                     <small className="text-tertiary">
                       Created: {new Date(habit.created_at).toLocaleDateString()}
@@ -284,14 +283,19 @@ function EditHabitModal({
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Description</label>
-            <textarea
+            <label className="form-label">Frequency</label>
+            <select
               className="form-input"
-              name="description"
-              defaultValue={habit.description}
-              rows={3}
+              name="frequency"
+              defaultValue={habit.frequency}
               required
-            />
+            >
+              <option value="daily">Daily</option>
+              <option value="every-other-day">Every Other Day (3-4x/week)</option>
+              <option value="twice-weekly">Twice Weekly</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
           </div>
           <div className="modal-actions">
             <button type="button" onClick={onCancel} className="btn btn-secondary">

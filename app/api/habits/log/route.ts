@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
  * GET - Retrieve habit logs
  *
  * Fetches habit log entries with optional filtering by habit ID and/or date.
- * Includes habit details (title, description) in the response.
+ * Includes habit titles in the response.
  *
  * Query Parameters:
  * - habitId: Filter logs for a specific habit
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
 
     // Build dynamic query with optional filters
     let query = `
-      SELECT hl.*, h.title, h.description
+      SELECT hl.*, h.title
       FROM habit_logs hl
       JOIN habits h ON hl.habit_id = h.id
       WHERE hl.user_id = $1

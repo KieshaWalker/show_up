@@ -24,9 +24,8 @@ import Link from "next/link";
 interface Habit {
   id: number;
   title: string;
-  description: string;
   created_at: string;
-  frequency?: string;
+  frequency: string;
 }
 
 /**
@@ -183,12 +182,58 @@ export default function HabitsPreview() {
   };
 
   /**
-   * Check if a specific habit is completed today
-   * @param habitId - ID of the habit to check
-   * @returns boolean indicating completion status
+   * Calculate weekly target based on habit frequency
+   * @param frequency - The habit frequency setting
+   * @returns Number of times the habit should be done per week
    */
-  const isHabitCompletedToday = (habitId: number) => {
-    return habitLogs.some(log => log.habit_id === habitId && log.completed);
+  const getWeeklyTarget = (frequency: string): number => {
+    switch (frequency) {
+      case 'daily': return 7;
+      case 'every-other-day': return 4; // 3-4 times per week
+      case 'twice-weekly': return 2;
+      case 'weekly': return 1;
+      case 'monthly': return 0; // Monthly habits don't have weekly targets
+      default: return 7;
+    }
+  };
+
+  /**
+   * Get habit completions for today and yesterday
+   * @param habitId - ID of the habit to check
+   * @returns Object with today and yesterday completion status
+   */
+  const getRecentCompletions = (habitId: number) => {
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    const todayCompleted = habitLogs.some(log =>
+      log.habit_id === habitId &&
+      log.date === today &&
+      log.completed
+    );
+
+    const yesterdayCompleted = habitLogs.some(log =>
+      log.habit_id === habitId &&
+      log.date === yesterday &&
+      log.completed
+    );
+
+    return { today: todayCompleted, yesterday: yesterdayCompleted };
+  };
+
+  /**
+   * Calculate remaining weekly completions needed
+   * @param habit - The habit object
+   * @returns Remaining completions needed this week
+   */
+  const getRemainingWeekly = (habit: Habit): number => {
+    const weeklyTarget = getWeeklyTarget(habit.frequency);
+    if (weeklyTarget === 0) return 0; // Monthly habits
+
+    const { today, yesterday } = getRecentCompletions(habit.id);
+    const recentCompletions = (today ? 1 : 0) + (yesterday ? 1 : 0);
+
+    return Math.max(0, weeklyTarget - recentCompletions);
   };
 
   /**
@@ -240,7 +285,6 @@ export default function HabitsPreview() {
         },
         body: JSON.stringify({
           title: quickAddTitle.trim(),
-          description: '',
           frequency: 'daily'
         }),
       });
@@ -295,26 +339,43 @@ export default function HabitsPreview() {
         </div>
       </div>
 
-      {/* Progress Bar - Shows daily completion percentage */}
+      {/* Progress Bar - Shows weekly completion percentage */}
       {totalHabits > 0 && (
         <div className="progress-section">
           <div className="progress-header">
-            <span className="progress-text">Today's Progress</span>
-            <span className="progress-count">{completedToday}/{totalHabits}</span>
+            <span className="progress-text">This Week's Progress</span>
+            <span className="progress-count">
+              {habits.reduce((total, habit) => {
+                const weeklyTarget = getWeeklyTarget(habit.frequency);
+                const remaining = getRemainingWeekly(habit);
+                return total + (weeklyTarget - remaining);
+              }, 0)}/
+              {habits.reduce((total, habit) => total + getWeeklyTarget(habit.frequency), 0)} completed
+            </span>
           </div>
           <div className="progress-bar">
             <div
               className="progress-fill"
-              style={{ width: `${totalHabits > 0 ? (completedToday / totalHabits) * 100 : 0}%` }}
+              style={{
+                width: `${(() => {
+                  const totalWeekly = habits.reduce((total, habit) => total + getWeeklyTarget(habit.frequency), 0);
+                  const completedWeekly = habits.reduce((total, habit) => {
+                    const weeklyTarget = getWeeklyTarget(habit.frequency);
+                    const remaining = getRemainingWeekly(habit);
+                    return total + (weeklyTarget - remaining);
+                  }, 0);
+                  return totalWeekly > 0 ? (completedWeekly / totalWeekly) * 100 : 0;
+                })()}%`
+              }}
             ></div>
           </div>
         </div>
       )}
 
-      {/* Suggestion Card - Appears when habits are incomplete and food data exists */}
-      {totalHabits > 0 && completedToday < totalHabits && foodUsageStats.length > 0 && (
+      {/* Suggestion Card - Appears when habits need weekly completion and food data exists */}
+      {totalHabits > 0 && habits.some(habit => getRemainingWeekly(habit) > 0) && foodUsageStats.length > 0 && (
         <div className="suggestion-card">
-          <h4 className="suggestion-title">💡 Complete {totalHabits - completedToday} more habit{totalHabits - completedToday !== 1 ? 's' : ''}!</h4>
+          <h4 className="suggestion-title">💡 Complete your weekly habits!</h4>
           <p className="suggestion-subtitle">Your favorite foods are ready:</p>
           <div className="suggestion-foods">
             {foodUsageStats.slice(0, 3).map((food) => (
@@ -331,6 +392,7 @@ export default function HabitsPreview() {
           </div>
         </div>
       )}
+      
 
       {/* Quick Add Form - Toggleable form for creating new habits */}
       {showQuickAdd && (
@@ -371,7 +433,11 @@ export default function HabitsPreview() {
       ) : (
         <div className="habits-grid">
           {habits.slice(0, 3).map((habit) => {
-            const isCompleted = isHabitCompletedToday(habit.id);
+            const { today, yesterday } = getRecentCompletions(habit.id);
+            const remainingWeekly = getRemainingWeekly(habit);
+            const weeklyTarget = getWeeklyTarget(habit.frequency);
+            const isCompleted = today; // Use today's completion status for checkbox
+
             return (
               <div
                 key={habit.id}
@@ -390,10 +456,22 @@ export default function HabitsPreview() {
                   />
                   <h4 className="habit-title">{habit.title}</h4>
                 </div>
-                {habit.description && (
-                  <p className="habit-description">{habit.description}</p>
+
+                {/* Weekly Progress Display */}
+                {weeklyTarget > 0 && (
+                  <div className="weekly-progress mb-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className={`status-dot ${today ? 'completed' : 'pending'}`}>Today</span>
+                      <span className={`status-dot ${yesterday ? 'completed' : 'pending'}`}>Yesterday</span>
+                      <span className="weekly-count">
+                        {remainingWeekly}/{weeklyTarget} left this week
+                      </span>
+                    </div>
+                  </div>
                 )}
+
                 <small className="habit-date">
+                  {habit.frequency !== 'daily' && `${habit.frequency.replace('-', ' ')} • `}
                   Created {new Date(habit.created_at).toLocaleDateString()}
                 </small>
               </div>

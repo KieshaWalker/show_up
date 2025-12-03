@@ -8,7 +8,6 @@ interface CalendarEntry {
     id: number;
     title: string;
     completed: boolean;
-    notes?: string;
     date: string;
   }>;
   nutrition: Array<{
@@ -17,7 +16,6 @@ interface CalendarEntry {
     calories: number;
     quantity: number;
     serving_size?: string;
-    notes?: string;
     date: string;
   }>;
 }

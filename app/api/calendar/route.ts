@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch all habit logs for this month with habit details
     const habitsQuery = `
-      SELECT hl.id, hl.date, hl.completed, hl.notes, h.title, h.description
+      SELECT hl.id, hl.date, hl.completed, h.title
       FROM habit_logs hl
       JOIN habits h ON hl.habit_id = h.id
       WHERE hl.user_id = $1
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch all nutrition logs for this month with food details
     const nutritionQuery = `
-      SELECT nl.id, nl.date, nl.quantity, nl.notes, f.name, f.calories, f.serving_size
+      SELECT nl.id, nl.date, nl.quantity, f.name, f.calories, f.serving_size
       FROM nutrition_logs nl
       JOIN food f ON nl.food_id = f.id
       WHERE nl.user_id = $1
@@ -82,13 +82,15 @@ export async function GET(request: NextRequest) {
     const nutritionResult = await pool.query(nutritionQuery, [user.id, startDate, endDate]);
 
     // Get total unique habits created by this user (for statistics)
-    const uniqueHabitsQuery = `
+    const HabitsQuery = `
       SELECT COUNT(*) as count FROM habits WHERE user_id = $1
     `;
-    const uniqueHabitsResult = await pool.query(uniqueHabitsQuery, [user.id]);
-    const totalUniqueHabits = parseInt(uniqueHabitsResult.rows[0].count);
 
+    const HabitsResult = await pool.query(HabitsQuery, [user.id]);
+
+    const totalUniqueHabits = parseInt(HabitsResult.rows[0].count);
     // Get total unique food items created by this user (for statistics)
+
     const uniqueFoodQuery = `
       SELECT COUNT(*) as count FROM food WHERE user_id = $1
     `;
