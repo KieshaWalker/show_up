@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
 
     const pool = getPool();
 
-    // Security check: Ensure food item belongs to authenticated user
+    // Security check: Ensure food item belongs to authenticated user or is a pantry item
     const foodCheck = await pool.query(
-      "SELECT id, calories FROM food WHERE id = $1 AND user_id = $2",
+      "SELECT id, calories FROM food WHERE id = $1 AND (user_id = $2 OR user_id = 'all_users')",
       [foodId, user.id]
     );
 
