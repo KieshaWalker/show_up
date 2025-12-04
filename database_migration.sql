@@ -388,3 +388,49 @@ Potassium	240 mg	6%
 
 SELECT * FROM food;
 
+SELECT * FROM nutrition_logs;
+
+SELECT * FROM habit_logs;
+SELECT * FROM habits;
+
+SELECT habits.title, habit_logs.date FROM habits JOIN habit_logs ON habit_logs.habit_id = habits.id;
+-- explanation of line above: 
+-- This SQL query retrieves the titles of habits along with their corresponding log dates by performing an inner join between the "habits" table and the "habit_logs" table based on the matching habit IDs.
+
+
+-- searching a specific user's habits and habit logs
+SELECT habits.title, habit_logs.date FROM habits JOIN habit_logs ON habit_logs.habit_id = habits.id AND habit_logs.user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f';
+
+-- now search for the same but only for yesterdays date and shows marked completed
+SELECT habits.title, habit_logs.date FROM habits JOIN habit_logs ON habit_logs.habit_id = habits.id AND habit_logs.user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f' WHERE habit_logs.date = CURRENT_DATE - INTERVAL '1 day' AND habit_logs.completed = TRUE;
+
+SELECT * FROM food;
+
+
+/* THIS IS OUR CURRENT PANTRY WE WILL DROP ANY DUPLICATES AND REPOPULATE FROM THE FRONTEND USING THE COMMON FOODS DATASET
+id |               user_id                |                      name                      |             serving_size             | calories | protein | total_fat | saturated_fat | trans_fat | cholesterol | sodium | total_carbohydrate | dietary_fiber | total_sugars | added_sugars | vitamin_d | calcium | iron | potassium |         created_at         | count 
+----+--------------------------------------+------------------------------------------------+--------------------------------------+----------+---------+-----------+---------------+-----------+-------------+--------+--------------------+---------------+--------------+--------------+-----------+---------+------+-----------+----------------------------+-------
+  1 | 8d3dc861-b08e-4c12-98d3-02ae483e641f | bread                                          | 1 serving                            |      100 |    0.00 |      0.00 |          0.00 |      0.00 |        0.00 |   0.00 |               0.00 |          0.00 |         0.00 |         0.00 |      0.00 |    0.00 | 0.00 |      0.00 | 2025-12-03 21:26:35.60069  |     0
+  2 | all_users                            | Sweet Ripe Plantains                           | 3 pieces(78g)                        |      130 |    1.00 |      2.00 |          0.00 |      0.00 |        0.00 |   0.00 |              28.00 |          2.00 |        18.00 |         0.00 |      0.00 |    0.00 | 0.00 |    370.00 | 2025-12-04 00:18:30.090235 |     0
+  3 | all_users                            | Mandarin Orange Chicken                        | 1 cup frozen chicken and sauce(163g) |      320 |   22.00 |     10.00 |          2.00 |      0.00 |       95.00 | 570.00 |              35.00 |          1.00 |        16.00 |        16.00 |      0.10 |   10.00 | 2.00 |    370.00 | 2025-12-04 00:18:30.090235 |     0
+  4 | all_users                            | Organic Low Sodium Vegetable Broth             | 1 cup(240mL)                         |       20 |    0.50 |      0.00 |          0.00 |      0.00 |        0.00 |  40.00 |               5.00 |          0.00 |         3.00 |         1.00 |      0.00 |   20.00 | 0.00 |     70.00 | 2025-12-04 00:18:30.090235 |     0
+  5 | all_users                            | Pineapple Teriyaki Chicken Meatballs           | 6 meatballs(85g)                     |      160 |   13.00 |      9.00 |          2.00 |      0.00 |       65.00 | 440.00 |               8.00 |          0.00 |         5.00 |         4.00 |      0.10 |   10.00 | 1.00 |    370.00 | 2025-12-04 00:18:30.090235 |     0
+  6 | all_users                            | Greek Nonfat Yogurt Plain                      | 3/4 Cup(170g)                        |      110 |   17.00 |      0.00 |          0.00 |      0.00 |       10.00 |  75.00 |               7.00 |          0.00 |         5.00 |         0.00 |      0.00 |  190.00 | 0.00 |    240.00 | 2025-12-04 00:18:30.090235 |     0
+  7 | all_users                            | Sweet Ripe Plantains                           | 3 pieces(78g)                        |      130 |    1.00 |      2.00 |          0.00 |      0.00 |        0.00 |   0.00 |              28.00 |          2.00 |        18.00 |         0.00 |      0.00 |    0.00 | 0.00 |    370.00 | 2025-12-04 00:18:48.626681 |     0
+  8 | all_users                            | Mandarin Orange Chicken                        | 1 cup frozen chicken and sauce(163g) |      320 |   22.00 |     10.00 |          2.00 |      0.00 |       95.00 | 570.00 |              35.00 |          1.00 |        16.00 |        16.00 |      0.10 |   10.00 | 2.00 |    370.00 | 2025-12-04 00:18:48.626681 |     0
+  9 | all_users                            | Organic Low Sodium Vegetable Broth             | 1 cup(240mL)                         |       20 |    0.50 |      0.00 |          0.00 |      0.00 |        0.00 |  40.00 |               5.00 |          0.00 |         3.00 |         1.00 |      0.00 |   20.00 | 0.00 |     70.00 | 2025-12-04 00:18:48.626681 |     0
+ 10 | all_users                            | Pineapple Teriyaki Chicken Meatballs           | 6 meatballs(85g)                     |      160 |   13.00 |      9.00 |          2.00 |      0.00 |       65.00 | 440.00 |               8.00 |          0.00 |         5.00 |         4.00 |      0.10 |   10.00 | 1.00 |    370.00 | 2025-12-04 00:18:48.626681 |     0
+ 11 | all_users                            | Greek Nonfat Yogurt Plain                      | 3/4 Cup(170g)                        |      110 |   17.00 |      0.00 |          0.00 |      0.00 |       10.00 |  75.00 |               7.00 |          0.00 |         5.00 |         0.00 |      0.00 |  190.00 | 0.00 |    240.00 | 2025-12-04 00:18:48.626681 |     0
+ 12 | all_users                            | Organic Chicken Nuggets                        | 4 pieces(79g)                        |      180 |   10.00 |     10.00 |          3.00 |      0.00 |       30.00 | 450.00 |              13.00 |          0.00 |         1.00 |         1.00 |      0.00 |   20.00 | 0.70 |    320.00 | 2025-12-04 00:18:48.626681 |     0
+ 13 | all_users                            | All Natural Ground Chicken                     | 4 oz(112g)                           |      170 |   22.00 |      9.00 |          2.50 |      0.00 |      105.00 | 130.00 |               0.00 |          0.00 |         0.00 |         0.00 |      0.00 |    0.00 | 6.00 |      0.00 | 2025-12-04 00:18:48.626681 |     0
+ 14 | all_users                            | Chicken Meatballs                              | 4 Meatballs(85g)                     |      150 |   16.00 |      9.00 |          2.00 |      0.00 |       80.00 | 300.00 |               2.00 |          0.00 |         0.00 |         0.00 |      0.00 |   20.00 | 1.30 |    480.00 | 2025-12-04 00:18:48.626681 |     0
+ 15 | all_users                            | Fresh Atlantic Salmon Boneless Skinless Fillet | 1 fillet(154g)                       |      230 |   22.50 |     14.00 |          3.50 |      0.00 |       55.00 |  45.00 |               0.00 |          0.00 |         0.00 |         0.00 |     10.00 |   20.00 | 0.50 |    410.00 | 2025-12-04 00:18:48.626681 |     0
+ 16 | all_users                            | ground turkey                                  | 4 oz(112g)                           |      170 |   21.50 |      8.00 |          2.50 |      0.00 |       82.50 |  90.00 |               0.00 |          0.00 |         0.00 |         0.00 |      0.00 |    0.00 | 0.00 |      0.00 | 2025-12-04 00:18:48.626681 |     0
+ 17 | all_users                            | Gluten Free Multigrain Bread                   | 1 slice(36g)                         |      100 |    2.00 |      2.00 |          0.00 |      0.00 |        0.00 | 160.00 |              19.00 |          2.00 |         3.00 |         2.00 |      0.00 |   10.00 | 0.60 |     40.00 | 2025-12-04 00:18:48.626681 |     0
+ 18 | all_users                            | European Grains & Seeds Bread                  | 1 slice(52g)       
+ */
+
+
+
+
+SELECT * FROM food WHERE user_id = 'all_users';

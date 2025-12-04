@@ -17,6 +17,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { Yesteryear } from "next/font/google";
 
 /**
  * Habit data structure
@@ -58,8 +59,6 @@ interface DashboardData {
  * @returns {JSX.Element} Habits preview dashboard
  */
 export default function HabitsPreview() {
-  // Food usage statistics for smart suggestions
-  const [foodUsageStats, setFoodUsageStats] = useState<Array<{id: number, name: string, count: number, calories: number}>>([]);
 
   // Progress tracking state
   const [totalHabits, setTotalHabits] = useState(0);
@@ -85,7 +84,6 @@ export default function HabitsPreview() {
   useEffect(() => {
     fetchHabits();
     fetchTodayLogs();
-    fetchFoodUsageStats();
     fetchDashboardData();
   }, []);
 
@@ -131,38 +129,9 @@ export default function HabitsPreview() {
     }
   };
 
-  const fetchFoodUsageStats = async () => {
-    try {
-      // Get all nutrition logs to calculate usage statistics
-      const response = await fetch('/api/nutrition/log');
 
-      if (response.ok) {
-        const data = await response.json();
-        const logs = data.nutritionLogs || [];
 
-        // Count usage by food item
-        const usageMap = new Map<number, {name: string, count: number, calories: number}>();
-        logs.forEach((log: any) => {
-          const existing = usageMap.get(log.food_id) || { name: log.name, count: 0, calories: log.calories };
-          usageMap.set(log.food_id, {
-            name: existing.name,
-            count: existing.count + 1,
-            calories: log.calories
-          });
-        });
-
-        // Convert to sorted array (most used first)
-        const sortedStats = Array.from(usageMap.entries())
-          .map(([id, data]) => ({ id, ...data }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5); // Top 5 most used foods
-
-        setFoodUsageStats(sortedStats);
-      }
-    } catch (error) {
-      console.error("Error fetching food usage stats:", error);
-    }
-  };
+  
 
   const fetchDashboardData = async () => {
     try {
@@ -171,6 +140,8 @@ export default function HabitsPreview() {
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data);
+      } else {
+        console.error('Failed to fetch dashboard data:', response.status);
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -245,6 +216,7 @@ export default function HabitsPreview() {
       log.completed
     );
 
+
     return { today: todayCompleted, yesterday: yesterdayCompleted };
   };
 
@@ -263,37 +235,7 @@ export default function HabitsPreview() {
     return Math.max(0, weeklyTarget - recentCompletions);
   };
 
-  /**
-   * Log food consumption from suggestion card
-   * Adds nutrition entry and refreshes usage statistics
-   * @param foodId - ID of the food item to log
-   * @param quantity - Quantity consumed (default: 1)
-   */
-  const logFoodConsumption = async (foodId: number, quantity: number = 1) => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const response = await fetch('/api/nutrition/log', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          foodId,
-          date: today,
-          quantity,
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh food usage stats after logging
-        await fetchFoodUsageStats();
-      } else {
-        console.error('Failed to log food consumption');
-      }
-    } catch (error) {
-      console.error('Error logging food:', error);
-    }
-  };
+ 
 
   /**
    * Handle quick-add habit form submission
@@ -415,12 +357,12 @@ export default function HabitsPreview() {
             </div>
           )}
 
-          {dashboardData.yesterdayHabits.length > 0 && (
+          {dashboardData && dashboardData.yesterdayHabits && (
             <div className="summary-card">
               <h3 className="summary-h3">Yesterday's Completed Habits</h3>
               <div className="summary-list">
-                {dashboardData.yesterdayHabits.map((habit) => (
-                  <div key={`${habit.habit_id}-${habit.date}`} className="summary-item">
+                {dashboardData.yesterdayHabits.map((habit, index) => (
+                  <div key={`yesterday-${habit.habit_id}-${habit.date}-${index}`} className="summary-item">
                     <span className="habits-completed-yesterday">{habit.title}</span>
                   </div>
                 ))}
@@ -430,26 +372,6 @@ export default function HabitsPreview() {
         </div>
       )}
 
-      {/* Suggestion Card - Appears when habits need weekly completion and food data exists */}
-      {totalHabits > 0 && habits.some(habit => getRemainingWeekly(habit) > 0) && foodUsageStats.length > 0 && (
-        <div className="suggestion-card">
-          <h4 className="suggestion-title">💡 Complete your weekly habits!</h4>
-          <p className="suggestion-subtitle">Your favorite foods are ready:</p>
-          <div className="suggestion-foods">
-            {foodUsageStats.slice(0, 3).map((food) => (
-              <button
-                key={food.id}
-                onClick={() => logFoodConsumption(food.id, 1)}
-                className="suggestion-food-button"
-              >
-                <span className="food-name">{food.name}</span>
-                <span className="food-calories">{food.calories} cal</span>
-                <span className="food-count">{food.count}x logged</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
       
 
       {/* Quick Add Form - Toggleable form for creating new habits */}

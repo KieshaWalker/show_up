@@ -46,3 +46,6 @@ how-to.txt
 .env*.local
 
 data_base
+
+
+app/api/data/common_foods.ts

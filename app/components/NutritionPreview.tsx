@@ -69,6 +69,8 @@ interface DashboardData {
 export default function NutritionPreview() {
   // Food database state
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [foodUsageStats, setFoodUsageStats] = useState<Array<{id: number, name: string, count: number, calories: number}>>([]);
+  
 
   // Today's nutrition logs
   const [nutritionLogs, setNutritionLogs] = useState<NutritionLog[]>([]);
@@ -94,6 +96,7 @@ export default function NutritionPreview() {
     fetchFoodItems();
     fetchTodayLogs();
     fetchDashboardData();
+    fetchFoodUsageStats();
   }, []);
 
   /**
@@ -120,8 +123,38 @@ export default function NutritionPreview() {
     }
   };
 
+  const fetchFoodUsageStats = async () => {
+    try {
+      // Get all nutrition logs to calculate usage statistics
+      const response = await fetch('/api/nutrition/log');
 
+      if (response.ok) {
+        const data = await response.json();
+        const logs = data.nutritionLogs || [];
 
+        // Count usage by food item
+        const usageMap = new Map<number, {name: string, count: number, calories: number}>();
+        logs.forEach((log: any) => {
+          const existing = usageMap.get(log.food_id) || { name: log.name, count: 0, calories: log.calories };
+          usageMap.set(log.food_id, {
+            name: existing.name,
+            count: existing.count + 1,
+            calories: log.calories
+          });
+        });
+
+        // Convert to sorted array (most used first)
+        const sortedStats = Array.from(usageMap.entries())
+          .map(([id, data]) => ({ id, ...data }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5); // Top 5 most used foods
+
+        setFoodUsageStats(sortedStats);
+      }
+    } catch (error) {
+      console.error("Error fetching food usage stats:", error);
+    }
+  };
 
   /**
    * Fetch today's nutrition logs
@@ -153,6 +186,27 @@ export default function NutritionPreview() {
       console.error("Error fetching dashboard data:", error);
     }
   };
+  console.log("Food Items:", foodItems);
+
+  // fetching foods as a food pantry option, this will open up as a pop up, to add foods from the pantry. 
+  // the user will be able to see their top used foods from the pantry and if they need to see more they can click on the pop up.
+  // we will use all users food database for this feature.
+
+  const pantry = async () => {
+    try {
+      const response = await fetch('/api/calendar/pantry');
+        
+      if (response.ok) {
+        const data = await response.json();
+        setFoodItems(data.food || []);
+      }
+    } catch (error) {
+      console.error("Error fetching pantry food items:", error);
+    }
+  };
+
+
+
 
   /**
    * Log food consumption for today
@@ -239,6 +293,8 @@ export default function NutritionPreview() {
     }
   };
 
+
+
   /**
    * Calculate total calories consumed today
    * Sums up calories from all logged food items
@@ -295,6 +351,26 @@ export default function NutritionPreview() {
         <div className="calories-number">{getTodayCalories()}</div>
         <div className="calories-label">calories today</div>
       </div>
+
+      
+      {/* Suggestion Card - Appears when habits need weekly completion and food data exists */}
+        <div className="suggestion-card">
+          <p className="suggestion-subtitle">Your favorite foods are ready:</p>
+          <div className="suggestion-foods">
+            {foodUsageStats.slice(0, 3).map((food) => (
+              <button
+                key={food.id}
+                onClick={() => logFoodConsumption(food.id, 1)}
+                className="suggestion-food-button"
+              >
+                <span className="food-name">{food.name}</span>
+                <span className="food-calories">{food.calories} cal</span>
+                <span className="food-count">{food.count}x logged</span>
+              </button>
+            ))}
+          </div>
+        </div>
+    
 
       {/* Today's Nutrition Entries - detailed from dashboard data */}
       {dashboardData && dashboardData.nutritionLogs.length > 0 && (

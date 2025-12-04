@@ -54,23 +54,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insert or update habit log using PostgreSQL upsert
-    const query = `
-      INSERT INTO habit_logs (habit_id, user_id, date, completed)
-      VALUES ($1, $2, $3, $4)
-      ON CONFLICT (habit_id, user_id, date)
-      DO UPDATE SET
-        completed = EXCLUDED.completed,
-        updated_at = CURRENT_TIMESTAMP
-      RETURNING *
+    // Check if habit log already exists for this habit, user, and date
+    const existingLogQuery = `
+      SELECT id FROM habit_logs 
+      WHERE habit_id = $1 AND user_id = $2 AND date = $3
     `;
+    const existingLog = await pool.query(existingLogQuery, [habitId, user.id, date]);
 
-    const result = await pool.query(query, [
-      habitId,
-      user.id,
-      date,
-      completed || false
-    ]);
+    let result;
+    if (existingLog.rows.length > 0) {
+      // Update existing log
+      const updateQuery = `
+        UPDATE habit_logs 
+        SET completed = $4, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $5
+        RETURNING *
+      `;
+      result = await pool.query(updateQuery, [completed || false, existingLog.rows[0].id]);
+    } else {
+      // Insert new log
+      const insertQuery = `
+        INSERT INTO habit_logs (habit_id, user_id, date, completed)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+      `;
+      result = await pool.query(insertQuery, [habitId, user.id, date, completed || false]);
+    }
 
     return NextResponse.json({
       message: "Habit log saved successfully",

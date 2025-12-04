@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
     const habitLogsQuery = `
         SELECT hl.habit_id, hl.user_id, hl.date, hl.completed, hl.completed_on, hl.created_at, hl.updated_at, h.title
         FROM habit_logs hl
-        JOIN habits h ON hl.habit_id = h.id
-        WHERE hl.user_id = $1
+        LEFT JOIN habits h ON hl.habit_id = h.id
+        WHERE hl.user_id = $1 AND h.id IS NOT NULL
     `;
     const habitLogsResult = await pool.query(habitLogsQuery, [user.id]);
     const habitLogs = habitLogsResult.rows;
