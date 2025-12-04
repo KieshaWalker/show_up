@@ -47,6 +47,8 @@ export async function GET(request: NextRequest) {
       
     });
 
+    console.log('Pantry items fetched successfully');
+
   } catch (error) {
     console.error('Error fetching pantry items:', error);
     return NextResponse.json(
