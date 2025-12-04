@@ -88,6 +88,10 @@ export default function NutritionPreview() {
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
   const [quantity, setQuantity] = useState(1);
 
+  // Pantry food items map
+    const [pantryMap, setPantryMap] = useState<Map<number, FoodItem>>(new Map());
+
+
   /**
    * Initialize component data on mount
    * Fetches food items, today's nutrition logs, and dashboard data
@@ -97,6 +101,7 @@ export default function NutritionPreview() {
     fetchTodayLogs();
     fetchDashboardData();
     fetchFoodUsageStats();
+    fetchPantryItems();
   }, []);
 
   /**
@@ -192,19 +197,28 @@ export default function NutritionPreview() {
   // the user will be able to see their top used foods from the pantry and if they need to see more they can click on the pop up.
   // we will use all users food database for this feature.
 
-  const pantry = async () => {
+  /**
+   * Fetch pantry food items from shared database
+   * Loads common food items available to all users
+   */
+  const fetchPantryItems = async () => {
     try {
       const response = await fetch('/api/calendar/pantry');
-        
+
       if (response.ok) {
         const data = await response.json();
-        setFoodItems(data.food || []);
+        const pantryItems = data.food || [];
+        const pantryMap = new Map<number, FoodItem>();
+        pantryItems.forEach((item: FoodItem) => {
+          pantryMap.set(item.id, item);
+        });
+        setPantryMap(pantryMap);
       }
     } catch (error) {
-      console.error("Error fetching pantry food items:", error);
+      console.error("Error fetching pantry items:", error);
     }
   };
-
+  console.log("Pantry Map:", pantryMap);
 
 
 
@@ -385,6 +399,28 @@ export default function NutritionPreview() {
           </div>
         </div>
       )}
+      {/* Pantry items quick add and button to see more*/}
+      <div className="pantry-section">
+        <h4 className="pantry-title">Food Pantry</h4>
+        <div className="pantry-foods">
+          {Array.from(pantryMap.values()).slice(0, 4).map((food) => (
+            <button
+              key={food.id}
+              onClick={() => logFoodConsumption(food.id, 1)}
+              className="pantry-food-button"
+            >
+              <span className="food-name">{food.name}</span>
+              <span className="food-calories">{food.calories} cal</span>
+            </button>
+          ))}
+        </div>
+        {pantryMap.size > 4 && (
+          <Link href="/nutrition/pantry" className="text-sm text-accent hover:underline mt-2 inline-block">
+            View all pantry foods →
+          </Link>
+        )}
+          
+      </div>
 
       {/* Weekly Nutrition Summary */}
       {dashboardData && dashboardData.weeklyCalories > 0 && (
