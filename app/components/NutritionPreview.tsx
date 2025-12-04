@@ -191,7 +191,6 @@ export default function NutritionPreview() {
       console.error("Error fetching dashboard data:", error);
     }
   };
-  console.log("Food Items:", foodItems);
 
   // fetching foods as a food pantry option, this will open up as a pop up, to add foods from the pantry. 
   // the user will be able to see their top used foods from the pantry and if they need to see more they can click on the pop up.
@@ -218,7 +217,11 @@ export default function NutritionPreview() {
       console.error("Error fetching pantry items:", error);
     }
   };
-  console.log("Pantry Map:", pantryMap);
+  const handlePantryClick = async (foodId: number) => {
+    if (foodId) {
+      logFoodConsumption(foodId, 1);
+    }
+  };
 
 
 
@@ -401,24 +404,20 @@ export default function NutritionPreview() {
       )}
       {/* Pantry items quick add and button to see more*/}
       <div className="pantry-section">
-        <h4 className="pantry-title">Food Pantry</h4>
+        <h4 className="pantry-title">Pantry</h4>
         <div className="pantry-foods">
-          {Array.from(pantryMap.values()).slice(0, 4).map((food) => (
+          {Array.from(pantryMap.values()).slice(0, 8).map((food) => (
             <button
               key={food.id}
-              onClick={() => logFoodConsumption(food.id, 1)}
-              className="pantry-food-button"
+              onClick={() => handlePantryClick(food.id)}
+              className="suggestion-food-button"
             >
               <span className="food-name">{food.name}</span>
               <span className="food-calories">{food.calories} cal</span>
             </button>
           ))}
         </div>
-        {pantryMap.size > 4 && (
-          <Link href="/nutrition/pantry" className="text-sm text-accent hover:underline mt-2 inline-block">
-            View all pantry foods →
-          </Link>
-        )}
+     
           
       </div>
 
