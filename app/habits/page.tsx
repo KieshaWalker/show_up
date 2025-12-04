@@ -8,6 +8,7 @@ interface Habit {
   title: string;
   created_at: string;
   frequency: string;
+  color?: string;
 }
 
 interface HabitLog {
@@ -128,6 +129,7 @@ export default function HabitsPage() {
       data.append("id", editingHabit.id.toString());
       data.append("title", formData.get("title") as string);
       data.append("frequency", formData.get("frequency") as string);
+      data.append("color", (formData.get("color") as string) || "#7cf4ff");
 
       const response = await fetch(`/api/habits`, {
         method: "PUT",
@@ -266,6 +268,13 @@ function EditHabitModal({
     onSave(formData);
   };
 
+  const colorChoices = [
+    { value: '#7cf4ff', label: 'Calm' },
+    { value: '#facc15', label: 'Medium' },
+    { value: '#f97316', label: 'High' },
+    { value: '#ef4444', label: 'Critical' },
+  ];
+
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -295,6 +304,25 @@ function EditHabitModal({
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
             </select>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Priority color</label>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {colorChoices.map((choice, index) => (
+                <label key={choice.value} className={`flex items-center gap-2 px-2 py-1 rounded-md border cursor-pointer ${habit.color === choice.value ? 'border-gray-400' : 'border-gray-200'}`}>
+                  <input
+                    type="radio"
+                    name="color"
+                    value={choice.value}
+                    defaultChecked={habit.color ? habit.color === choice.value : index === 0}
+                    className="hidden"
+                    required
+                  />
+                  <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: choice.value }} />
+                  <span>{choice.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
           <div className="modal-actions">
             <button type="button" onClick={onCancel} className="btn btn-secondary">

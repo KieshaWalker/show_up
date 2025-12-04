@@ -400,3 +400,4 @@ Potassium	240 mg	6%
 
 
 SELECT * FROM habits;
+

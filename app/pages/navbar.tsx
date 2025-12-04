@@ -89,15 +89,13 @@ const Navbar: React.FC = () => {
             <a href="/about" className="nav-link">
               About
             </a>
-            <a href="/contact" className="nav-link">
-              Contact
-            </a>
+          
 
             {/* Authenticated User Links */}
             {user ? (
               <>
                 <a href="/habits" className="nav-link">
-                  Your Habits
+                  add Habits
                 </a>
                 <a href="/calendar" className="nav-link">
                   Calendar
@@ -106,14 +104,12 @@ const Navbar: React.FC = () => {
                   Sign Out
                 </a>
                 <a href="/nutrition" className="nav-link">
-                  Nutrition
+                  add Nutrition
                 </a>
                   <a href="/api/calendar/dashboard" className="nav-link">
                   Dashboard
                 </a>
-                <a href="/featuring" className="nav-link">
-                  Yesterday's Summary
-                </a>
+                
               </>
             ) : null}
           </div>

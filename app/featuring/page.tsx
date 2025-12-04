@@ -144,6 +144,7 @@ export default async function featuring() {
           startOfWeek={startOfWeek.toISOString().slice(0, 10)}
           endOfWeek={endOfWeek.toISOString().slice(0, 10)}
           habits={habitsWithRemaining}
+          displayName={user.displayName || user.name || "you"}
         />
       </div>
     </div>

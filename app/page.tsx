@@ -1,22 +1,10 @@
-/**
- * Home Page Component
- *
- * The main dashboard page of the ShowUp habit tracking application.
- * Displays different content based on user authentication status.
- */
-
-import Image from "next/image";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 import { checkDbConnection } from "./db";
-import Handler from "./handler/[...stack]/page";
 import userPage from "./handler/[...stack]/user";
-import { StackServerApp } from "@stackframe/stack";
 import { stackServerApp } from "@/stack/server";
-import HabitsPreview from "./components/HabitsPreview";
 import NutritionPreview from "./components/NutritionPreview";
 import CalendarPreview from "./components/CalendarPreview";
-import yesterdayPage from "./featuring/page";
-
+import featuring from "./featuring/page";
 /**
  * Home Page Component
  *
@@ -33,13 +21,10 @@ import yesterdayPage from "./featuring/page";
  */
 export default async function Home() {
   // Check database connectivity on page load
-  const result = await checkDbConnection();
+  await checkDbConnection();
 
   // Check if user is authenticated
   const user = await stackServerApp.getUser();
-
-
-
 
   // Render landing page for unauthenticated users
   if (!user) {
@@ -57,21 +42,28 @@ export default async function Home() {
     );
   }
 
+  const userContent = await userPage();
+  if (userContent instanceof Response) {
+    redirect("/handler/sign-in");
+  }
+
+  const featuringContent = await featuring();
+  if (featuringContent instanceof Response) {
+    redirect("/handler/sign-in");
+  }
+
+
   // Render dashboard for authenticated users
   return (
     <div className="main-content">
       <div className="content-container">
-        {/* User profile section */}
-        <div className="user-profile fade-in-up">
-          {await userPage()}
-        </div>
-    
+      
         {/* Main dashboard title */}
-        <h1 className="page-title fade-in-up">Your Journey Starts Here</h1>
+        <h1 className="page-t">ShowUp, because momentum matters</h1>
 
         {/* Dashboard preview components */}
-        <div className="fade-in-up">
-          <HabitsPreview />
+        <div className="fade-in-up" style={{ animationDelay: "0.1s" }}>
+          {featuringContent}
           <NutritionPreview />
           <CalendarPreview />
         </div>

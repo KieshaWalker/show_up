@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
 
     let title: string;
     let frequency: string = 'daily';
+    let color: string = '#7cf4ff';
 
     // Handle both JSON and FormData request formats
     const contentType = request.headers.get('content-type');
@@ -44,10 +45,12 @@ export async function POST(request: NextRequest) {
       const jsonData = await request.json();
       title = jsonData.title;
       frequency = jsonData.frequency || 'daily';
+      color = jsonData.color || color;
     } else {
       const formData = await request.formData();
       title = formData.get("title") as string;
       frequency = formData.get("frequency") as string || 'daily';
+      color = (formData.get("color") as string) || color;
     }
 
     // Validate required fields
@@ -57,11 +60,11 @@ export async function POST(request: NextRequest) {
 
     // Insert new habit into database
     const insertQuery = `
-      INSERT INTO habits (user_id, title, frequency)
-      VALUES ($1, $2, $3) RETURNING *
+      INSERT INTO habits (user_id, title, frequency, color)
+      VALUES ($1, $2, $3, $4) RETURNING *
     `;
 
-    await pool.query(insertQuery, [user.id, title.trim(), frequency]);
+    await pool.query(insertQuery, [user.id, title.trim(), frequency, color]);
 
    
     return NextResponse.redirect(new URL('/', request.url));
@@ -178,6 +181,7 @@ export async function PUT(request: NextRequest) {
     const rawTitle = formData.get("title");
     const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
     const frequency = formData.get("frequency") as string || 'daily';
+    const color = (formData.get("color") as string) || '#7cf4ff';
 
     if (!habitId) {
       return NextResponse.json({ error: "Habit ID required" }, { status: 400 });
@@ -192,12 +196,12 @@ export async function PUT(request: NextRequest) {
     // Update habit (ensures user owns the habit for security)
     const updateQuery = `
       UPDATE habits
-      SET title = $1, frequency = $2
-      WHERE id = $3 AND user_id = $4
+      SET title = $1, frequency = $2, color = $3
+      WHERE id = $4 AND user_id = $5
       RETURNING *
     `;
 
-    const values = [title, frequency, habitId, user.id];
+    const values = [title, frequency, color, habitId, user.id];
 
     const result = await pool.query(updateQuery, values);
 

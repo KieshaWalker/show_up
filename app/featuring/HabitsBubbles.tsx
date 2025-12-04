@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 type HabitBubble = {
   id: number;
   title: string;
@@ -13,9 +12,13 @@ type HabitBubble = {
   completedToday: boolean;
 };
 
-export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits }: { today: string; startOfWeek: string; endOfWeek: string; habits: HabitBubble[] }) {
+export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, displayName }: { today: string; startOfWeek: string; endOfWeek: string; habits: HabitBubble[]; displayName?: string }) {
   const [items, setItems] = useState<HabitBubble[]>(habits);
   const [savingId, setSavingId] = useState<number | null>(null);
+
+  const totalTarget = items.reduce((sum, h) => sum + h.weeklyTarget, 0);
+  const totalCompleted = items.reduce((sum, h) => sum + h.weeklyCompleted, 0);
+  const progress = totalTarget > 0 ? Math.min((totalCompleted / totalTarget) * 100, 100) : 0;
 
   const toggleToday = async (habit: HabitBubble) => {
     if (savingId !== null) return; // avoid double-clicks
@@ -51,13 +54,27 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits }:
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bubbles">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
-          <h2 className="page-title" style={{ marginBottom: 0 }}>This week&apos;s bubbles</h2>
-          <p className="text-sm text-gray-400">Week {startOfWeek} → {endOfWeek}</p>
+          <h2 className="b-title" style={{ marginTop: 16 }}>{displayName || "you"}</h2>
+          <p className="b-p">Week {startOfWeek} → {endOfWeek}</p>
         </div>
-        <p className="text-sm text-gray-300">Click a habit bubble to toggle today.</p>
+        <p className="b-p">Consistency beats intensity</p>
+      </div>
+      <div className="bubble-progress-bar ">
+        <div className="flex items-center justify-between text-sm text-gray-200">
+          <span>Total target: <strong className="text-white">{totalTarget}</strong></span>
+          <span>Completed: <strong className="text-white">{totalCompleted}</strong></span>
+        </div>
+        <div className="w-full h-3 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="h-full rounded-full"
+            style={{ width: `${progress}%`, background: "linear-gradient(90deg, #7cf4ff, #8f8bff)" }}
+            aria-label="weekly progress"
+          />
+        </div>
+        <div className="text-right text-xs text-gray-300">{progress.toFixed(0)}% of weekly possible habits</div>
       </div>
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {items.map((habit) => {

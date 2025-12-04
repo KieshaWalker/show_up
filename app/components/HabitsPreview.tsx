@@ -76,6 +76,15 @@ export default function HabitsPreview() {
   const [error, setError] = useState<string | null>(null);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [quickAddTitle, setQuickAddTitle] = useState('');
+  const [quickAddFrequency, setQuickAddFrequency] = useState('daily');
+  const [quickAddColor, setQuickAddColor] = useState('');
+
+  const colorChoices = [
+    { value: '#7cf4ff', label: 'Calm' },
+    { value: '#facc15', label: 'Medium' },
+    { value: '#f97316', label: 'High' },
+    { value: '#ef4444', label: 'Critical' },
+  ];
 
   /**
    * Initialize component data on mount
@@ -247,7 +256,9 @@ export default function HabitsPreview() {
    */
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!quickAddTitle.trim()) return;
+    // let the user choose a drop down now
+    
+    if (!quickAddTitle.trim() || !quickAddFrequency || !quickAddColor) return;
 
     try {
       const response = await fetch('/api/habits', {
@@ -257,12 +268,16 @@ export default function HabitsPreview() {
         },
         body: JSON.stringify({
           title: quickAddTitle.trim(),
-          frequency: 'daily'
+          frequency: quickAddFrequency,
+          color: quickAddColor,
+    
         }),
       });
 
       if (response.ok) {
         setQuickAddTitle('');
+        setQuickAddFrequency('daily');
+        setQuickAddColor('');
         setShowQuickAdd(false);
         await fetchHabits(); // Refresh habits list
       } else {
@@ -349,28 +364,69 @@ export default function HabitsPreview() {
       {/* Quick Add Form - Toggleable form for creating new habits */}
       {showQuickAdd && (
         <div className="mb-4 p-3 bg-surface-secondary rounded-md">
-          <form onSubmit={handleQuickAdd} className="flex gap-2">
-            <input
-              type="text"
-              value={quickAddTitle}
-              onChange={(e) => setQuickAddTitle(e.target.value)}
-              placeholder="Habit name..."
-              className="flex-1 form-input text-sm"
-              required
-            />
-            <button type="submit" className="btn btn-primary btn-sm">
-              Add
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setShowQuickAdd(false);
-                setQuickAddTitle('');
-              }}
-              className="btn btn-ghost btn-sm"
-            >
-              Cancel
-            </button>
+          <form onSubmit={handleQuickAdd} className="flex flex-col gap-3">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={quickAddTitle}
+                onChange={(e) => setQuickAddTitle(e.target.value)}
+                placeholder="Habit name..."
+                className="quick-add-h"
+                required
+              />
+              <select
+                value={quickAddFrequency}
+                onChange={(e) => setQuickAddFrequency(e.target.value)}
+                className="form-input text-sm w-44"
+                required
+              >
+                <option value="daily">Daily</option>
+                <option value="every-other-day">Every other day</option>
+                <option value="twice-a-week">Twice a week</option>
+                <option value="three-times-a-week">Three times a week</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center text-sm">
+              <span className="text-xs uppercase tracking-wide text-gray-400">Priority color</span>
+              {colorChoices.map((choice) => (
+                <label key={choice.value} className={`flex items-center gap-1 px-2 py-1 rounded-md border cursor-pointer ${quickAddColor === choice.value ? 'border-white/60' : 'border-white/10'}`}>
+                  <input
+                    type="radio"
+                    name="priority-color"
+                    value={choice.value}
+                    checked={quickAddColor === choice.value}
+                    onChange={() => setQuickAddColor(choice.value)}
+                    className="hidden"
+                    required
+                  />
+                  <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: choice.value }} />
+                  <span>{choice.label}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <button type="submit" className="btn btn-primary btn-sm" disabled={!quickAddColor}>
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowQuickAdd(false);
+                  setQuickAddTitle('');
+                  setQuickAddFrequency('daily');
+                  setQuickAddColor('');
+                }}
+                className="btn btn-ghost btn-sm"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}

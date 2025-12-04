@@ -22,6 +22,27 @@ export default async function AddHabit() {
             <option value="monthly">Monthly</option>
           </select>
         </label>
+        <fieldset className="add-habit-label">
+          <legend className="text-sm font-medium mb-1">Priority color:</legend>
+          <div className="flex gap-3 flex-wrap text-sm">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="color" value="#7cf4ff" required />
+              <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: '#7cf4ff' }} /> Calm
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="color" value="#facc15" required />
+              <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: '#facc15' }} /> Medium
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="color" value="#f97316" required />
+              <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: '#f97316' }} /> High
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="color" value="#ef4444" required />
+              <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: '#ef4444' }} /> Critical
+            </label>
+          </div>
+        </fieldset>
         <button id="add-habit-button" type="submit">Add Habit</button>
 
 
