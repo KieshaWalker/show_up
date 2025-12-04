@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const query = `
       INSERT INTO habit_logs (habit_id, user_id, date, completed)
       VALUES ($1, $2, $3, $4)
-      ON CONFLICT (habit_id, date)
+      ON CONFLICT (habit_id, user_id, date)
       DO UPDATE SET
         completed = EXCLUDED.completed,
         updated_at = CURRENT_TIMESTAMP

@@ -44,6 +44,20 @@ interface NutritionLog {
 }
 
 /**
+ * Dashboard data from API
+ */
+interface DashboardData {
+  nutritionLogs: Array<{id: number, name: string, quantity: number, calories: number, meal_type: string}>;
+  weeklyNutrition: Array<{id: number, date: string, name: string, quantity: number, calories: number, meal_type: string}>;
+  totalCaloriesConsumed: number;
+  totalProteinConsumed: number;
+  totalFatConsumed: number;
+  totalCarbsConsumed: number;
+  weeklyCalories: number;
+  caloriesYesterdayTotal: number;
+}
+
+/**
  * NutritionPreview Component
  *
  * Displays a comprehensive nutrition dashboard with food logging capabilities.
@@ -59,6 +73,9 @@ export default function NutritionPreview() {
   // Today's nutrition logs
   const [nutritionLogs, setNutritionLogs] = useState<NutritionLog[]>([]);
 
+  // Dashboard data state
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+
   // UI state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,11 +88,12 @@ export default function NutritionPreview() {
 
   /**
    * Initialize component data on mount
-   * Fetches food items and today's nutrition logs
+   * Fetches food items, today's nutrition logs, and dashboard data
    */
   useEffect(() => {
     fetchFoodItems();
     fetchTodayLogs();
+    fetchDashboardData();
   }, []);
 
   /**
@@ -102,6 +120,9 @@ export default function NutritionPreview() {
     }
   };
 
+
+
+
   /**
    * Fetch today's nutrition logs
    * Retrieves all food consumption entries for the current date
@@ -117,6 +138,19 @@ export default function NutritionPreview() {
       }
     } catch (error) {
       console.error("Error fetching nutrition logs:", error);
+    }
+  };
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch('/api/dashboard');
+
+      if (response.ok) {
+        const data = await response.json();
+        setDashboardData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
     }
   };
 
@@ -189,6 +223,7 @@ export default function NutritionPreview() {
         }),
       });
 
+
       if (response.ok) {
         const result = await response.json();
         setQuickAddName('');
@@ -240,7 +275,8 @@ export default function NutritionPreview() {
     <div className="glass-card nutrition-preview">
       {/* Header section with title and action buttons */}
       <div className="preview-header">
-        <h3 className="preview-title">Your Nutrition</h3>
+        <h3 className="preview-title">Today's Nutrition
+        </h3>
         <div className="flex gap-2">
           <button
             onClick={() => setShowQuickAdd(!showQuickAdd)}
@@ -259,6 +295,35 @@ export default function NutritionPreview() {
         <div className="calories-number">{getTodayCalories()}</div>
         <div className="calories-label">calories today</div>
       </div>
+
+      {/* Today's Nutrition Entries - detailed from dashboard data */}
+      {dashboardData && dashboardData.nutritionLogs.length > 0 && (
+        <div className="summary-card">
+          <h3 className="summary-h3">Today's Nutrition Entries</h3>
+          <div className="summary-list">
+            {dashboardData.nutritionLogs.map((log) => (
+              <div key={log.id} className="summary-item">
+                <span className="habits-completed-today">{log.name} - {log.quantity} serving(s) - {log.calories} kcal - {log.meal_type}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Weekly Nutrition Summary */}
+      {dashboardData && dashboardData.weeklyCalories > 0 && (
+        <div className="weekly-summary">
+          <h4 className="activity-title">Weekly Nutrition</h4>
+          <div className="stat-item">
+            <div className="stat-number">{dashboardData.weeklyCalories}</div>
+            <div className="stat-label">Total Calories</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">{dashboardData.caloriesYesterdayTotal}</div>
+            <div className="stat-label">Yesterday's Calories</div>
+          </div>
+        </div>
+      )}
 
       {/* Quick add food form - conditionally rendered */}
       {showQuickAdd && (

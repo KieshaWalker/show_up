@@ -17,6 +17,19 @@ interface CalendarStats {
     habits: number;                 // Number of habits completed that day
     nutrition: number;              // Number of nutrition entries that day
   }>;
+  
+  // New data from dashboard
+  todayHabits: Array<{habit_id: number, date: string, title: string}>;
+  yesterdayHabits: Array<{habit_id: number, date: string, title: string}>;
+  todayNutrition: Array<{id: number, name: string, quantity: number, calories: number, meal_type: string}>;
+  weeklyNutrition: Array<{id: number, date: string, name: string, quantity: number, calories: number, meal_type: string}>;
+  totalHabitsCompletedToday: number;
+  totalCaloriesConsumed: number;
+  totalProteinConsumed: number;
+  totalFatConsumed: number;
+  totalCarbsConsumed: number;
+  weeklyCalories: number;
+  caloriesYesterdayTotal: number;
 }
 
 /**
@@ -54,17 +67,26 @@ export default function CalendarPreview() {
 
       // Get current month data from calendar API
       const now = new Date();
-      const response = await fetch(`/api/calendar?year=${now.getFullYear()}&month=${now.getMonth() + 1}`);
+      const calendarResponse = await fetch(`/api/calendar?year=${now.getFullYear()}&month=${now.getMonth() + 1}`);
 
-      if (!response.ok) {
+      if (!calendarResponse.ok) {
         throw new Error('Failed to fetch calendar stats');
       }
 
-      const data = await response.json();
+      const calendarData = await calendarResponse.json();
+
+      // Get dashboard data for today's and yesterday's details
+      const dashboardResponse = await fetch('/api/dashboard');
+
+      if (!dashboardResponse.ok) {
+        throw new Error('Failed to fetch dashboard data');
+      }
+
+      const dashboardData = await dashboardResponse.json();
 
       // Process calendar data to extract recent activity
-      const calendarData = data.calendarData || {};
-      const dates = Object.keys(calendarData);
+      const calData = calendarData.calendarData || {};
+      const dates = Object.keys(calData);
 
       // Sort dates descending and take last 7 days
       const recentActivity = dates
@@ -72,17 +94,29 @@ export default function CalendarPreview() {
         .slice(0, 7)
         .map(date => ({
           date,
-          habits: calendarData[date].habits?.length || 0,
-          nutrition: calendarData[date].nutrition?.length || 0
+          habits: calData[date].habits?.length || 0,
+          nutrition: calData[date].nutrition?.length || 0
         }));
 
-      // Set aggregated statistics
+      // Set aggregated statistics with dashboard data
       setStats({
-        totalHabits: data.totalHabits || 0,
-        totalNutritionEntries: data.totalNutritionEntries || 0,
-        totalUniqueHabits: data.totalUniqueHabits || 0,
-        totalUniqueFood: data.totalUniqueFood || 0,
-        recentActivity
+        totalHabits: calendarData.totalHabits || 0,
+        totalNutritionEntries: calendarData.totalNutritionEntries || 0,
+        totalUniqueHabits: calendarData.totalUniqueHabits || 0,
+        totalUniqueFood: calendarData.totalUniqueFood || 0,
+        recentActivity,
+        // Dashboard data
+        todayHabits: dashboardData.todayHabits || [],
+        yesterdayHabits: dashboardData.yesterdayHabits || [],
+        todayNutrition: dashboardData.nutritionLogs || [],
+        weeklyNutrition: dashboardData.weeklyNutrition || [],
+        totalHabitsCompletedToday: dashboardData.totalHabitsCompletedToday || 0,
+        totalCaloriesConsumed: dashboardData.totalCaloriesConsumed || 0,
+        totalProteinConsumed: dashboardData.totalProteinConsumed || 0,
+        totalFatConsumed: dashboardData.totalFatConsumed || 0,
+        totalCarbsConsumed: dashboardData.totalCarbsConsumed || 0,
+        weeklyCalories: dashboardData.weeklyCalories || 0,
+        caloriesYesterdayTotal: dashboardData.caloriesYesterdayTotal || 0
       });
     } catch (error) {
       console.error('Error fetching calendar stats:', error);
@@ -122,6 +156,7 @@ export default function CalendarPreview() {
 
   return (
     <div className="glass-card calendar-preview">
+
       {/* Header section with title and navigation link */}
       <div className="preview-header">
         <h3 className="preview-title">This Month's Activity</h3>
@@ -130,7 +165,6 @@ export default function CalendarPreview() {
         </Link>
       </div>
 
-      {/* Monthly statistics display - three key metrics */}
       <div className="calendar-stats">
         <div className="stat-item">
           <div className="stat-number">{totalActivity}</div>
@@ -145,6 +179,16 @@ export default function CalendarPreview() {
           <div className="stat-label">Foods Added</div>
         </div>
       </div>
+
+      {stats.weeklyCalories > 0 && (
+        <div className="weekly-summary">
+          <h4 className="activity-title">Weekly Nutrition</h4>
+          <div className="stat-item">
+            <div className="stat-number">{stats.weeklyCalories}</div>
+            <div className="stat-label">Total Calories</div>
+          </div>
+        </div>
+      )}
 
       {/* Recent activity timeline - shows last 3 active days */}
       {recentActivityCount > 0 && (

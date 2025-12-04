@@ -39,6 +39,16 @@ interface HabitLog {
 }
 
 /**
+ * Dashboard data from API
+ */
+interface DashboardData {
+  todayHabits: Array<{habit_id: number, date: string, title: string}>;
+  yesterdayHabits: Array<{habit_id: number, date: string, title: string}>;
+  totalHabitsCompletedToday: number;
+  weeklyNutrition: Array<any>;
+}
+
+/**
  * HabitsPreview Component
  *
  * Displays a comprehensive habits dashboard with progress tracking and smart suggestions.
@@ -55,6 +65,9 @@ export default function HabitsPreview() {
   const [totalHabits, setTotalHabits] = useState(0);
   const [completedToday, setCompletedToday] = useState(0);
 
+  // Dashboard data state
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+
   // Core data state
   const [habits, setHabits] = useState<Habit[]>([]);
   const [habitLogs, setHabitLogs] = useState<HabitLog[]>([]);
@@ -67,12 +80,13 @@ export default function HabitsPreview() {
 
   /**
    * Initialize component data on mount
-   * Fetches habits, today's logs, and food usage statistics
+   * Fetches habits, today's logs, food usage statistics, and dashboard data
    */
   useEffect(() => {
     fetchHabits();
     fetchTodayLogs();
     fetchFoodUsageStats();
+    fetchDashboardData();
   }, []);
 
   /**
@@ -147,6 +161,19 @@ export default function HabitsPreview() {
       }
     } catch (error) {
       console.error("Error fetching food usage stats:", error);
+    }
+  };
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch('/api/dashboard');
+
+      if (response.ok) {
+        const data = await response.json();
+        setDashboardData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
     }
   };
 
@@ -369,6 +396,37 @@ export default function HabitsPreview() {
               }}
             ></div>
           </div>
+        </div>
+      )}
+
+      {/* Today's and Yesterday's Completed Habits - from dashboard data */}
+      {dashboardData && (
+        <div className="summary-s">
+          {dashboardData.totalHabitsCompletedToday > 0 && (
+            <div className="summary-card">
+              <h3 className="summary-h3">Today's Completed Habits</h3>
+              <div className="summary-list">
+                {dashboardData.todayHabits.map((habit) => (
+                  <div key={`${habit.habit_id}-${habit.date}`} className="summary-item">
+                    <span className="habits-completed-today">{habit.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {dashboardData.yesterdayHabits.length > 0 && (
+            <div className="summary-card">
+              <h3 className="summary-h3">Yesterday's Completed Habits</h3>
+              <div className="summary-list">
+                {dashboardData.yesterdayHabits.map((habit) => (
+                  <div key={`${habit.habit_id}-${habit.date}`} className="summary-item">
+                    <span className="habits-completed-yesterday">{habit.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

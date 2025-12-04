@@ -257,3 +257,134 @@ SELECT * FROM nutrition_logs WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e64
 
   -- select from todays nutrtion logs for user id '8d3dc861-b08e-4c12-98d3-02ae483e641f'
     SELECT * FROM nutrition_logs WHERE user_id = '8d3dc861-b08e-4c12-98d3-02ae483e641f' AND date = CURRENT_DATE;
+
+
+
+
+    --- inserting food from traderjoes for all users to be able to select from
+
+/*
+Sweet Ripe Plantains
+Nutrition Facts
+Serves about 6
+serving size
+3 pieces(78g)
+calories per serving
+130
+Amount	%DV
+Total Fat	2.0 g	3%
+Saturated Fat	0 g	0%
+Trans Fat	0 g	
+Cholesterol	0 mg	0%
+Sodium	0 mg	0%
+Total Carbohydrate	28 g	10%
+Dietary Fiber	2 g	7%
+Total Sugars	18 g	
+Includes	0 g Added Sugars	0%
+Protein	1 g	
+Vitamin D	0.0 mcg	0%
+Calcium	0 mg	0%
+Iron	0.0 mg	0%
+Potassium	370 mg	8%
+
+
+Mandarin Orange Chicken
+Nutrition Facts
+Serves about 4
+serving size
+1 cup frozen chicken and sauce(163g))
+calories per serving
+320
+Amount	%DV
+Total Fat	10g	13%
+Saturated Fat	2g	10%
+Trans Fat	0g	
+Cholesterol	95mg	32%
+Sodium	570mg	25%
+Total Carbohydrate	35g	13%
+Dietary Fiber	1g	4%
+Total Sugars	16g	
+Includes	16g Added Sugars	32%
+Protein	22g	
+Vitamin D	0.1mcg	0%
+Calcium	10mg	0%
+Iron	2mg	10%
+Potassium	370mg	8%
+
+
+Organic Low Sodium Vegetable Broth
+Nutrition Facts
+Serves About 4
+serving size
+1 cup(240mL)
+calories per serving
+20
+Amount	%DV
+Total Fat	0 g	0%
+Saturated Fat	0 g	0%
+Trans Fat	0 g	
+Cholesterol	0 mg	0%
+Sodium	40 mg	2%
+Total Carbohydrate	5 g	2%
+Dietary Fiber	0 g	0%
+Total Sugars	3 g	
+Includes	1 g Added Sugars	2%
+Protein	less than 1 g	
+Vitamin D	0.0 mcg	0%
+Calcium	20 mg	2%
+Iron	0.0 mg	0%
+Potassium	70 mg	2%
+
+
+Pineapple Teriyaki Chicken Meatballs
+Nutrition Facts
+Serves about 4
+serving size
+6 meatballs(85g)
+calories per serving
+160
+Amount	%DV
+Total Fat	9 g	12%
+Saturated Fat	2.0 g	10%
+Trans Fat	0 g	
+Cholesterol	65 mg	22%
+Sodium	440 mg	19%
+Total Carbohydrate	8 g	3%
+Dietary Fiber	0 g	0%
+Total Sugars	5 g	
+Includes	4 g Added Sugars	8%
+Protein	13 g	
+Vitamin D	0.1 mcg	0%
+Calcium	10 mg	0%
+Iron	1.0 mg	6%
+Potassium	370 mg	8%
+
+Greek Nonfat Yogurt Plain
+
+Nutrition Facts
+Serves about 5
+serving size
+3/4 Cup(170g)
+calories per serving
+110
+Amount	%DV
+Total Fat	0 g	0%
+Saturated Fat	0 g	0%
+Trans Fat	0 g	
+Cholesterol	10 mg	3%
+Sodium	75 mg	3%
+Total Carbohydrate	7 g	3%
+Dietary Fiber	0 g	0%
+Total Sugars	5 g	
+Includes	0 g Added Sugars	0%
+Protein	17 g	34%
+Vitamin D	0.0 mcg	0%
+Calcium	190 mg	15%
+Iron	0.0 mg	0%
+Potassium	240 mg	6%
+
+*/
+
+
+SELECT * FROM food;
+
