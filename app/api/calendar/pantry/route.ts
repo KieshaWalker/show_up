@@ -39,10 +39,12 @@ export async function GET(request: NextRequest) {
     `;
 
     const pantryResult = await pool.query(pantryQuery);
-
+    
     return NextResponse.json({
       food: pantryResult.rows,
-      total: pantryResult.rows.length
+      total: pantryResult.rows.length,
+      calories: pantryResult.rows.reduce((sum, item) => sum + item.calories, 0),
+      
     });
 
   } catch (error) {
