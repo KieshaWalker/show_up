@@ -9,7 +9,7 @@
  *
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { redirect } from 'next/navigation';
 import { getPool } from '../db';
 import { authenticateUser } from '../utils/auth';
 import HabitsBubbles from './HabitsBubbles';
@@ -30,8 +30,8 @@ import HabitsBubbles from './HabitsBubbles';
 export default async function featuring() {
   try {
     const authResult = await authenticateUser();
-    if (authResult instanceof NextResponse) {
-      return authResult;
+    if (authResult instanceof Response) {
+      redirect('/handler/sign-in');
     }
     const user = authResult;
 
@@ -144,7 +144,7 @@ export default async function featuring() {
           startOfWeek={startOfWeek.toISOString().slice(0, 10)}
           endOfWeek={endOfWeek.toISOString().slice(0, 10)}
           habits={habitsWithRemaining}
-          displayName={user.displayName || user.name || "you"}
+          displayName={user.displayName || "you"}
         />
       </div>
     </div>

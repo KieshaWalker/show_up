@@ -65,6 +65,8 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+--coolshadow: 5px 5px 30px rgba(0, 0, 0, 0.986);
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -78,6 +80,7 @@
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --coolshadow: 5px 5px 30px rgba(0, 0, 0, 0.986);
   }
 }
 
@@ -121,8 +124,12 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
+  box-shadow: var(--coolshadow);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bubbles:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
 .glass-card:hover {
@@ -1673,7 +1680,7 @@ h3, p {
   margin-bottom: var(--spacing-xs);
 }
 
-.nutrition-preview .food-name {
+.nutrition-preview  {
   font-size: 0.875rem;
   color: var(--text-primary);
 }
@@ -1786,6 +1793,7 @@ h3, p {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--spacing-sm);
+  color: #000;
 }
 
 .suggestion-food-button {
@@ -1796,7 +1804,7 @@ h3, p {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-md);
-  color: white;
+  color: black;
   cursor: pointer;
   transition: all 0.2s ease;
   backdrop-filter: blur(10px);
@@ -1808,10 +1816,7 @@ h3, p {
   box-shadow: var(--shadow-sm);
 }
 
-.food-name {
-  font-weight: 500;
-  flex: 1;
-}
+
 
 .food-calories {
   font-size: 0.875rem;
@@ -1934,7 +1939,7 @@ margin: 0;
 padding: var(--spacing-md);
 background-color: rgba(105, 105, 105, 0.336);
 border-radius: var(--radius-xl);
-box-shadow: 0 0 30px rgba(0, 0, 0, 0.466);
+   box-shadow: var(--coolshadow);
 border: 1px solid var(--glass-border);
 -webkit-backdrop-filter: blur(10px);
 backdrop-filter: blur(10px);
@@ -1955,13 +1960,7 @@ backdrop-filter: blur(10px);
     font-weight: 600;
     color: var(--accent);
   }
-  .food-name {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-    text-align: center;
-  }
+ 
  
 .weekly-summary, .nut-title, .pantry-section {
   margin-top: var(--spacing-2xl);
@@ -1994,14 +1993,7 @@ backdrop-filter: blur(10px);
     font-weight: 600;
     color: var(--accent);
   }
-  .food-name {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-    text-align: center;
-  }
- 
+
 
 
   .bubbles {
@@ -2017,15 +2009,42 @@ backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
   }
 
-  .b-p {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    text-align: center;
-    font-style: italic;
-    margin: 3rem;
-    
+  
+.reactive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.986);
+  border: 1px solid var(--glass-border);
+  background-color: #0c0c0c2f;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.reactive:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.5s ease;
+}
+
+.b-a {
+   background-color: rgba(37, 35, 35, 0.1);
+   border-radius: var(--radius-md);
+    padding: 10px;
+   transform: translateY(2.7rem);
+   
   }
+
+  .b-p {
+    background-color: rgba(37, 35, 35, 0.1);
+    border-radius: var(--radius-md);
+    padding: 10px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
 
   .quick-add-h {
     display: grid;
@@ -2034,7 +2053,7 @@ backdrop-filter: blur(10px);
     margin-top: var(--spacing-lg);
   }
 
-.page-t, .b-title {
+.page-t, .b-title, .nut-title, .activity-title, .pantry-title {
   position: relative;
   font-size: 2rem;
   color: var(--text-primary);
@@ -2069,4 +2088,12 @@ backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     align-items: center;
     justify-content: center;
+  }
+
+.food-name {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+    text-align: center;
+    color: black;
   }

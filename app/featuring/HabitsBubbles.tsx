@@ -60,7 +60,7 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
           <h2 className="b-title" style={{ marginTop: 16 }}>{displayName || "you"}</h2>
           <p className="b-p">Week {startOfWeek} → {endOfWeek}</p>
         </div>
-        <p className="b-p">Consistency beats intensity</p>
+        <p className="b-a">Consistency beats intensity</p>
       </div>
       <div className="bubble-progress-bar ">
         <div className="flex items-center justify-between text-sm text-gray-200">
@@ -85,7 +85,7 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
               key={habit.id}
               onClick={() => toggleToday(habit)}
               disabled={savingId === habit.id}
-              className="relative flex flex-col items-start gap-1 rounded-2xl border border-white/10 px-4 py-3 text-left transition hover:-translate-y-1 hover:shadow-lg"
+              className="reactive"
               style={{
                 background: isActive ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.12)",
                 boxShadow: isActive ? "none" : `0 10px 30px ${bubbleColor}22`,
