@@ -66,8 +66,8 @@ export async function POST(request: NextRequest) {
       // Update existing log
       const updateQuery = `
         UPDATE habit_logs 
-        SET completed = $4, updated_at = CURRENT_TIMESTAMP
-        WHERE id = $5
+        SET completed = $1, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
         RETURNING *
       `;
       result = await pool.query(updateQuery, [completed || false, existingLog.rows[0].id]);
