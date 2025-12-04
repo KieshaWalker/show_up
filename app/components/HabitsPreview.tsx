@@ -188,7 +188,10 @@ export default function HabitsPreview() {
     switch (frequency) {
       case 'daily': return 7;
       case 'every-other-day': return 4; // 3-4 times per week
-      case 'twice-weekly': return 2;
+      case 'twice-a-week': return 2;
+      case 'three-times-a-week': return 3;
+      case 'weekdays': return 5;
+      case 'weekends': return 2;
       case 'weekly': return 1;
       case 'monthly': return 0; // Monthly habits don't have weekly targets
       default: return 7;
@@ -292,9 +295,10 @@ export default function HabitsPreview() {
   }
 
   return (
+    
     <div className="glass-card habits-preview">
       <div className="preview-header">
-        <h3 className="preview-title">Your Habits</h3>
+        <h3 className="pantry-title">Your Habits</h3>
         <div className="flex gap-2">
           <button
             onClick={() => setShowQuickAdd(!showQuickAdd)}
@@ -307,7 +311,7 @@ export default function HabitsPreview() {
           </Link>
         </div>
       </div>
-
+<div className="nut-title">
       {/* Progress Bar - Shows weekly completion percentage */}
       {totalHabits > 0 && (
         <div className="progress-section">
@@ -341,7 +345,7 @@ export default function HabitsPreview() {
         </div>
       )}
 
-    
+   
       {/* Quick Add Form - Toggleable form for creating new habits */}
       {showQuickAdd && (
         <div className="mb-4 p-3 bg-surface-secondary rounded-md">
@@ -435,5 +439,7 @@ export default function HabitsPreview() {
         </div>
       )}
     </div>
+     </div>
   );
+
 }

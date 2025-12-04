@@ -15,6 +15,7 @@ import { stackServerApp } from "@/stack/server";
 import HabitsPreview from "./components/HabitsPreview";
 import NutritionPreview from "./components/NutritionPreview";
 import CalendarPreview from "./components/CalendarPreview";
+import yesterdayPage from "./featuring/page";
 
 /**
  * Home Page Component
@@ -64,7 +65,7 @@ export default async function Home() {
         <div className="user-profile fade-in-up">
           {await userPage()}
         </div>
-
+    
         {/* Main dashboard title */}
         <h1 className="page-title fade-in-up">Your Journey Starts Here</h1>
 

@@ -348,8 +348,9 @@ export default function NutritionPreview() {
     <div className="glass-card nutrition-preview">
       {/* Header section with title and action buttons */}
       <div className="preview-header">
-        <h3 className="preview-title">Today's Nutrition
-        </h3>
+        
+        <h3 className="pantry-title">Today's Nutrition
+           </h3>
         <div className="flex gap-2">
           <button
             onClick={() => setShowQuickAdd(!showQuickAdd)}
@@ -361,8 +362,9 @@ export default function NutritionPreview() {
             View All
           </Link>
         </div>
+        
       </div>
-
+<div className="nut-title">
       {/* Daily calorie summary display */}
       <div className="calories-summary">
         <div className="calories-number">{getTodayCalories()}</div>
@@ -386,6 +388,7 @@ export default function NutritionPreview() {
               </button>
             ))}
           </div>
+        </div>
         </div>
     
       {/* Pantry items quick add and button to see more*/}
@@ -451,10 +454,11 @@ export default function NutritionPreview() {
         </div>
       )}
 
+<div className="nut-title">
       {/* Today's food consumption log - shows recent items */}
       {nutritionLogs.length > 0 && (
         <div className="food-log">
-          <h4 className="food-log-title">Today's Foods</h4>
+          <h4 className="pantry-title">Today's Foods</h4>
           <div className="space-y-2">
             {nutritionLogs.slice(0, 15).map((log) => (
               <div key={log.id} className="food-item">
@@ -471,5 +475,7 @@ export default function NutritionPreview() {
         </div>
       )}
     </div>
+    </div>
+   
   );
 }

@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
     const user = authResult;
 
     // Parse request body
-    const { habitId, date, completed } = await request.json();
+    const { habitId, user_id, title, date, completed, count, color, frequency } = await request.json();
+    console.log("habit log route - request body:", { habitId, user_id, title, date, completed, count, color, frequency });
 
     // Validate required fields
     if (!habitId || !date) {
@@ -90,6 +91,65 @@ export async function POST(request: NextRequest) {
     console.error("Error logging habit:", error);
     return NextResponse.json(
       { error: "Failed to log habit" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PUT - Mark or unmark a habit for a specific date.
+ * Mirrors POST but is explicitly idempotent for toggling completion state.
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const authResult = await authenticateUser();
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+    const user = authResult;
+
+    const { habitId, date, completed } = await request.json();
+
+    if (!habitId || !date || typeof completed !== "boolean") {
+      return NextResponse.json(
+        { error: "habitId, date, and completed boolean are required" },
+        { status: 400 }
+      );
+    }
+
+    const pool = getPool();
+
+    const habitCheck = await pool.query(
+      "SELECT id FROM habits WHERE id = $1 AND (user_id = $2 OR user_id = 'test-user-id')",
+      [habitId, user.id]
+    );
+
+    if (habitCheck.rows.length === 0) {
+      return NextResponse.json(
+        { error: "Habit not found or access denied" },
+        { status: 404 }
+      );
+    }
+
+    // Upsert completion state for the given date
+    const upsertQuery = `
+      INSERT INTO habit_logs (habit_id, user_id, date, completed)
+      VALUES ($1, $2, $3, $4)
+      ON CONFLICT (habit_id, user_id, date)
+      DO UPDATE SET completed = EXCLUDED.completed, updated_at = CURRENT_TIMESTAMP
+      RETURNING *
+    `;
+
+    const result = await pool.query(upsertQuery, [habitId, user.id, date, completed]);
+
+    return NextResponse.json({
+      message: "Habit log updated",
+      habitLog: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error updating habit log:", error);
+    return NextResponse.json(
+      { error: "Failed to update habit log" },
       { status: 500 }
     );
   }

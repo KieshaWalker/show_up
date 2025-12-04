@@ -156,15 +156,15 @@ export default function CalendarPreview() {
 
   return (
     <div className="glass-card calendar-preview">
+      <div className="nut-title">
 
       {/* Header section with title and navigation link */}
-      <div className="preview-header">
-        <h3 className="preview-title">This Month's Activity</h3>
+      <div className="preview-h">
+        <h3 className="pantry-title">This Month's Activity</h3>
         <Link href="/calendar" className="btn btn-ghost btn-sm">
           View Full Calendar
         </Link>
       </div>
-
       <div className="calendar-stats">
         <div className="stat-item">
           <div className="stat-number">{totalActivity}</div>
@@ -181,7 +181,7 @@ export default function CalendarPreview() {
       </div>
 
       {stats.weeklyCalories > 0 && (
-        <div className="weekly-summary">
+        <div className="weekly-s">
           <h4 className="activity-title">Weekly Nutrition</h4>
           <div className="stat-item">
             <div className="stat-number">{stats.weeklyCalories}</div>
@@ -244,5 +244,6 @@ export default function CalendarPreview() {
         </div>
       )}
     </div>
+      </div>
   );
 }

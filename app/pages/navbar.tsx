@@ -111,6 +111,9 @@ const Navbar: React.FC = () => {
                   <a href="/api/calendar/dashboard" className="nav-link">
                   Dashboard
                 </a>
+                <a href="/featuring" className="nav-link">
+                  Yesterday's Summary
+                </a>
               </>
             ) : null}
           </div>

@@ -1,0 +1,103 @@
+"use client";
+
+import { useState } from "react";
+
+type HabitBubble = {
+  id: number;
+  title: string;
+  color?: string;
+  frequency: string;
+  weeklyTarget: number;
+  weeklyCompleted: number;
+  remainingThisWeek: number;
+  completedToday: boolean;
+};
+
+export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits }: { today: string; startOfWeek: string; endOfWeek: string; habits: HabitBubble[] }) {
+  const [items, setItems] = useState<HabitBubble[]>(habits);
+  const [savingId, setSavingId] = useState<number | null>(null);
+
+  const toggleToday = async (habit: HabitBubble) => {
+    if (savingId !== null) return; // avoid double-clicks
+    setSavingId(habit.id);
+    try {
+      const nextCompleted = !habit.completedToday;
+      const res = await fetch("/api/habits/log", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ habitId: habit.id, date: today, completed: nextCompleted }),
+      });
+      if (!res.ok) {
+        console.error("Failed to toggle habit", await res.text());
+        return;
+      }
+      setItems((prev) =>
+        prev.map((h) => {
+          if (h.id !== habit.id) return h;
+          const delta = nextCompleted ? -1 : 1;
+          const nextRemaining = Math.max(Math.min(h.remainingThisWeek + delta, h.weeklyTarget), 0);
+          const nextCompletedCount = h.weeklyCompleted + (nextCompleted ? 1 : -1);
+          return {
+            ...h,
+            completedToday: nextCompleted,
+            remainingThisWeek: nextRemaining,
+            weeklyCompleted: Math.max(nextCompletedCount, 0),
+          };
+        })
+      );
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h2 className="page-title" style={{ marginBottom: 0 }}>This week&apos;s bubbles</h2>
+          <p className="text-sm text-gray-400">Week {startOfWeek} → {endOfWeek}</p>
+        </div>
+        <p className="text-sm text-gray-300">Click a habit bubble to toggle today.</p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {items.map((habit) => {
+          const isActive = habit.completedToday;
+          const bubbleColor = habit.color || "#7cf4ff";
+          return (
+            <button
+              key={habit.id}
+              onClick={() => toggleToday(habit)}
+              disabled={savingId === habit.id}
+              className="relative flex flex-col items-start gap-1 rounded-2xl border border-white/10 px-4 py-3 text-left transition hover:-translate-y-1 hover:shadow-lg"
+              style={{
+                background: isActive ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.12)",
+                boxShadow: isActive ? "none" : `0 10px 30px ${bubbleColor}22`,
+                opacity: isActive ? 0.55 : 1,
+              }}
+              aria-pressed={isActive}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold"
+                  style={{ background: isActive ? "#4b5563" : bubbleColor, color: isActive ? "#e5e7eb" : "#05060a" }}
+                >
+                  {habit.title.slice(0, 2).toUpperCase()}
+                </span>
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-gray-400">{habit.frequency.replace(/-/g, " ")}</p>
+                  <p className="text-base font-semibold" style={{ letterSpacing: "-0.01em" }}>{habit.title}</p>
+                </div>
+              </div>
+              <div className="flex gap-4 text-xs text-gray-300">
+                <span>Target: <strong className="text-white">{habit.weeklyTarget}</strong></span>
+                <span>Done: <strong className="text-white">{habit.weeklyCompleted}</strong></span>
+                <span>Remaining: <strong className="text-white">{habit.remainingThisWeek}</strong></span>
+              </div>
+              {isActive && <p className="text-xs text-emerald-400">Marked done for today</p>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
