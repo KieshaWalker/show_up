@@ -341,39 +341,7 @@ export default function HabitsPreview() {
         </div>
       )}
 
-      {/* Today's and Yesterday's Completed Habits - from dashboard data */}
-      {dashboardData && (
-        <div className="summary-s">
-          {dashboardData.totalHabitsCompletedToday > 0 && (
-            <div className="summary-card">
-              <h3 className="summary-h3">Today's Completed Habits</h3>
-              <div className="summary-list">
-                {dashboardData.todayHabits.map((habit) => (
-                  <div key={`${habit.habit_id}-${habit.date}`} className="summary-item">
-                    <span className="habits-completed-today">{habit.title}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {dashboardData && dashboardData.yesterdayHabits && (
-            <div className="summary-card">
-              <h3 className="summary-h3">Yesterday's Completed Habits</h3>
-              <div className="summary-list">
-                {dashboardData.yesterdayHabits.map((habit, index) => (
-                  <div key={`yesterday-${habit.habit_id}-${habit.date}-${index}`} className="summary-item">
-                    <span className="habits-completed-yesterday">{habit.title}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      
-
+    
       {/* Quick Add Form - Toggleable form for creating new habits */}
       {showQuickAdd && (
         <div className="mb-4 p-3 bg-surface-secondary rounded-md">

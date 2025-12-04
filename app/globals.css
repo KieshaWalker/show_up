@@ -1937,3 +1937,8 @@ box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
   max-width: 600px;
   margin: 2rem auto;
 }
+
+.pantry-section {
+  margin-top: var(--spacing-2xl);
+  margin-bottom: var(--spacing-2xl);
+}

@@ -388,20 +388,6 @@ export default function NutritionPreview() {
           </div>
         </div>
     
-
-      {/* Today's Nutrition Entries - detailed from dashboard data */}
-      {dashboardData && dashboardData.nutritionLogs.length > 0 && (
-        <div className="summary-card">
-          <h3 className="summary-h3">Today's Nutrition Entries</h3>
-          <div className="summary-list">
-            {dashboardData.nutritionLogs.map((log) => (
-              <div key={log.id} className="summary-item">
-                <span className="habits-completed-today">{log.name} - {log.quantity} serving(s) - {log.calories} kcal - {log.meal_type}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
       {/* Pantry items quick add and button to see more*/}
       <div className="pantry-section">
         <h4 className="pantry-title">Pantry</h4>
@@ -470,55 +456,18 @@ export default function NutritionPreview() {
         <div className="food-log">
           <h4 className="food-log-title">Today's Foods</h4>
           <div className="space-y-2">
-            {nutritionLogs.slice(0, 3).map((log) => (
+            {nutritionLogs.slice(0, 15).map((log) => (
               <div key={log.id} className="food-item">
                 <span className="food-name">{log.name} ({log.quantity}x)</span>
                 <span className="food-calories">{Math.round(log.calories * log.quantity)} cal</span>
               </div>
             ))}
-            {nutritionLogs.length > 3 && (
+            {nutritionLogs.length && (
               <div className="text-center text-sm text-secondary">
-                +{nutritionLogs.length - 3} more items
+                +{nutritionLogs.length} more items
               </div>
             )}
           </div>
-        </div>
-      )}
-
-      {/* Quick food selection grid - buttons for common foods */}
-      {foodItems.length > 0 && (
-        <div>
-          <h4 className="text-sm font-semibold mb-2">Quick Add Food</h4>
-          <div className="quick-food-grid">
-            {foodItems.slice(0, 6).map((food) => (
-              <button
-                key={food.id}
-                onClick={() => logFoodConsumption(food.id, 1)}
-                className="quick-food-button"
-              >
-                <div className="quick-food-name">{food.name}</div>
-                <div className="quick-food-calories">{food.calories} cal</div>
-              </button>
-            ))}
-          </div>
-          {foodItems.length > 6 && (
-            <Link href="/nutrition" className="text-sm text-accent hover:underline mt-2 inline-block">
-              View all foods →
-            </Link>
-          )}
-        </div>
-      )}
-
-      {/* Empty state - shown when no food items exist */}
-      {foodItems.length === 0 && !showQuickAdd && (
-        <div className="empty-state">
-          <p>No food items yet. Start tracking your nutrition!</p>
-          <button
-            onClick={() => setShowQuickAdd(true)}
-            className="btn btn-primary btn-sm"
-          >
-            Add Your First Food
-          </button>
         </div>
       )}
     </div>

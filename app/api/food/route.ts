@@ -147,7 +147,7 @@ export async function GET() {
     // Fetch all food items for the user
     const selectQuery = `
       SELECT * FROM food
-      WHERE user_id = $1
+      WHERE user_id = $1 OR user_id = 'test-user-id'
       ORDER BY created_at DESC
     `;
 
