@@ -11,6 +11,22 @@ import { NextRequest } from "next/server";
 import { getPool } from "../../db";
 import { authenticateUser } from "../../utils/auth";
 
+const ALLOWED_FREQUENCIES = new Set([
+  "daily",
+  "weekly",
+  "monthly",
+  "every-other-day",
+  "twice-a-week",
+  "three-times-a-week",
+  "weekdays",
+  "weekends",
+]);
+
+function sanitizeFrequency(value: string | null | undefined): string {
+  if (value && ALLOWED_FREQUENCIES.has(value)) return value;
+  return "daily";
+}
+
 /**
  * POST - Create a new habit
  *
@@ -44,13 +60,14 @@ export async function POST(request: NextRequest) {
     if (contentType?.includes('application/json')) {
       const jsonData = await request.json();
       title = jsonData.title;
-      frequency = jsonData.frequency || 'daily';
+      frequency = sanitizeFrequency(jsonData.frequency);
       color = jsonData.color || color;
     } else {
       const formData = await request.formData();
-      title = formData.get("title") as string;
-      frequency = formData.get("frequency") as string || 'daily';
-      color = (formData.get("color") as string) || color;
+      const get = (key: string) => (formData as any).get(key) as FormDataEntryValue | null;
+      title = get("title") as string;
+      frequency = sanitizeFrequency(get("frequency") as string);
+      color = (get("color") as string) || color;
     }
 
     // Validate required fields
@@ -177,11 +194,12 @@ export async function PUT(request: NextRequest) {
 
     // Parse form data
     const formData = await request.formData();
-    const habitId = formData.get("id") as string;
-    const rawTitle = formData.get("title");
+    const get = (key: string) => (formData as any).get(key) as FormDataEntryValue | null;
+    const habitId = get("id") as string;
+    const rawTitle = get("title");
     const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
-    const frequency = formData.get("frequency") as string || 'daily';
-    const color = (formData.get("color") as string) || '#7cf4ff';
+    const frequency = sanitizeFrequency(get("frequency") as string);
+    const color = (get("color") as string) || '#7cf4ff';
 
     if (!habitId) {
       return NextResponse.json({ error: "Habit ID required" }, { status: 400 });

@@ -34,23 +34,23 @@ export async function POST(request: NextRequest) {
     const user = authResult;
 
     // Initialize nutritional data variables
-    let name: string;
-    let serving_size: string;
-    let calories: number;
-    let protein: number;
-    let total_fat: number;
-    let saturated_fat: number;
-    let trans_fat: number;
-    let cholesterol: number;
-    let sodium: number;
-    let total_carbohydrate: number;
-    let dietary_fiber: number;
-    let total_sugars: number;
-    let added_sugars: number;
-    let vitamin_d: number;
-    let calcium: number;
-    let iron: number;
-    let potassium: number;
+    let name = "";
+    let serving_size = "";
+    let calories = 0;
+    let protein = 0;
+    let total_fat = 0;
+    let saturated_fat = 0;
+    let trans_fat = 0;
+    let cholesterol = 0;
+    let sodium = 0;
+    let total_carbohydrate = 0;
+    let dietary_fiber = 0;
+    let total_sugars = 0;
+    let added_sugars = 0;
+    let vitamin_d = 0;
+    let calcium = 0;
+    let iron = 0;
+    let potassium = 0;
 
     // Handle both JSON and FormData request formats
     const contentType = request.headers.get('content-type');
@@ -77,23 +77,24 @@ export async function POST(request: NextRequest) {
     } else {
       // Parse FormData request body
       const formData = await request.formData();
-      name = formData.get("name") as string;
-      serving_size = formData.get("serving_size") as string || '1 serving';
-      calories = parseFloat(formData.get("calories") as string) || 0;
-      protein = parseFloat(formData.get("protein") as string) || 0;
-      total_fat = parseFloat(formData.get("total_fat") as string) || 0;
-      saturated_fat = parseFloat(formData.get("saturated_fat") as string) || 0;
-      trans_fat = parseFloat(formData.get("trans_fat") as string) || 0;
-      cholesterol = parseFloat(formData.get("cholesterol") as string) || 0;
-      sodium = parseFloat(formData.get("sodium") as string) || 0;
-      total_carbohydrate = parseFloat(formData.get("total_carbohydrate") as string) || 0;
-      dietary_fiber = parseFloat(formData.get("dietary_fiber") as string) || 0;
-      total_sugars = parseFloat(formData.get("total_sugars") as string) || 0;
-      added_sugars = parseFloat(formData.get("added_sugars") as string) || 0;
-      vitamin_d = parseFloat(formData.get("vitamin_d") as string) || 0;
-      calcium = parseFloat(formData.get("calcium") as string) || 0;
-      iron = parseFloat(formData.get("iron") as string) || 0;
-      potassium = parseFloat(formData.get("potassium") as string) || 0;
+      const get = (key: string) => (formData as any).get(key) as FormDataEntryValue | null;
+      const name = get("name") as string;
+      const servingSize = get("serving_size") as string;
+      const calories = parseInt(get("calories") as string, 10);
+      const protein = parseFloat(get("protein") as string);
+      const totalFat = parseFloat(get("total_fat") as string);
+      const saturatedFat = parseFloat(get("saturated_fat") as string);
+      const transFat = parseFloat(get("trans_fat") as string);
+      const cholesterol = parseFloat(get("cholesterol") as string);
+      const sodium = parseFloat(get("sodium") as string);
+      const totalCarbohydrate = parseFloat(get("total_carbohydrate") as string);
+      const dietaryFiber = parseFloat(get("dietary_fiber") as string);
+      const totalSugars = parseFloat(get("total_sugars") as string);
+      const addedSugars = parseFloat(get("added_sugars") as string);
+      const vitaminD = parseFloat(get("vitamin_d") as string);
+      const calcium = parseFloat(get("calcium") as string);
+      const iron = parseFloat(get("iron") as string);
+      const potassium = parseFloat(get("potassium") as string);
     }
 
     // Validate required fields

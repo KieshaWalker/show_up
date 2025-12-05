@@ -205,12 +205,7 @@ export default function HabitsPage() {
               {habits.map((habit) => (
                 <div key={habit.id} className="habit-card">
                   <div className="flex items-center gap-3 mb-3">
-                    <input
-                      type="checkbox"
-                      checked={isHabitCompletedToday(habit.id)}
-                      onChange={(e) => logHabitCompletion(habit.id, e.target.checked)}
-                      className="w-5 h-5 text-accent border-gray-300 rounded focus:ring-accent"
-                    />
+                  
                     <h3 className="habit-title">{habit.title}</h3>
                   </div>
                   <div className="habit-stats">
@@ -299,9 +294,12 @@ function EditHabitModal({
               required
             >
               <option value="daily">Daily</option>
-              <option value="every-other-day">Every Other Day (3-4x/week)</option>
-              <option value="twice-weekly">Twice Weekly</option>
               <option value="weekly">Weekly</option>
+              <option value="every-other-day">Every Other Day (3-4x/week)</option>
+              <option value="twice-a-week">Twice Weekly</option>
+              <option value="three-times-a-week">Three Times a Week</option>
+              <option value="weekdays">Weekdays</option>
+              <option value="weekends">Weekends</option>
               <option value="monthly">Monthly</option>
             </select>
           </div>
@@ -309,7 +307,7 @@ function EditHabitModal({
             <label className="form-label">Priority color</label>
             <div className="flex flex-wrap gap-2 text-sm">
               {colorChoices.map((choice, index) => (
-                <label key={choice.value} className={`flex items-center gap-2 px-2 py-1 rounded-md border cursor-pointer ${habit.color === choice.value ? 'border-gray-400' : 'border-gray-200'}`}>
+                <label key={choice.value} className={`input-g flex items-center gap-2 px-2 py-1 rounded-md border cursor-pointer ${habit.color === choice.value ? 'border-gray-400' : 'border-gray-200'}`}>
                   <input
                     type="radio"
                     name="color"
@@ -318,7 +316,7 @@ function EditHabitModal({
                     className="hidden"
                     required
                   />
-                  <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: choice.value }} />
+                  <span className="input-g inline-block h-4 w-4 rounded-full" style={{ backgroundColor: choice.value }} />
                   <span>{choice.label}</span>
                 </label>
               ))}

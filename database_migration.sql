@@ -401,3 +401,18 @@ Potassium	240 mg	6%
 
 SELECT * FROM habits;
 
+DROP TABLE IF EXISTS habits CASCADE;
+
+-- Create the habits table for habit tracking
+CREATE TABLE IF NOT EXISTS habits (
+  id SERIAL PRIMARY KEY,
+  user_id TEXT NOT NULL,  -- TEXT type to accept UUID strings from Stack Auth
+  title VARCHAR(255) NOT NULL,
+  frequency VARCHAR(20) DEFAULT 'daily' CHECK (frequency IN ('daily', 'weekly', 'monthly', 'every-other-day', 'twice-a-week', 'three-times-a-week', 'weekdays', 'weekends')),
+  color VARCHAR(7) DEFAULT '#007bff', -- Hex color for habit visualization
+  icon VARCHAR(50) DEFAULT 'target', -- Icon name for habit visualization
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  count INTEGER DEFAULT 0,
+  UNIQUE(user_id, title) -- Prevent duplicate habit titles per user
+);

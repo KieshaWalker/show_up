@@ -15,11 +15,14 @@ export default async function AddHabit() {
         <label className="add-habit-label">
           Frequency:
           <select className="form-input" name="frequency" required>
-            <option value="daily">Daily</option>
-            <option value="every-other-day">Every Other Day (3-4x/week)</option>
-            <option value="twice-weekly">Twice Weekly</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
+          <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="every-other-day">Every Other Day (3-4x/week)</option>
+              <option value="twice-a-week">Twice Weekly</option>
+              <option value="three-times-a-week">Three Times a Week</option>
+              <option value="weekdays">Weekdays</option>
+              <option value="weekends">Weekends</option>
+              <option value="monthly">Monthly</option>
           </select>
         </label>
         <fieldset className="add-habit-label">

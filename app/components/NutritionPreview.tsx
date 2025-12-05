@@ -310,7 +310,7 @@ export default function NutritionPreview() {
     }
   };
 
-
+console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardData });
 
   /**
    * Calculate total calories consumed today
@@ -382,9 +382,9 @@ export default function NutritionPreview() {
                 onClick={() => logFoodConsumption(food.id, 1)}
                 className="suggestion-food-button"
               >
-                <span className="food-name">{food.name}</span>
-                <span className="food-calories">{food.calories} cal</span>
-                <span className="food-count">{food.count}x logged</span>
+                <span className="food-n">{food.name}</span>
+                <span className="food-c">{food.calories} cal</span>
+                <span className="food-c">{food.count}x logged</span>
               </button>
             ))}
           </div>
@@ -434,10 +434,10 @@ export default function NutritionPreview() {
               value={quickAddName}
               onChange={(e) => setQuickAddName(e.target.value)}
               placeholder="Food name..."
-              className="flex-1 form-input text-sm"
+              className="quick-nutrition-input"
               required
             />
-            <button type="submit" className="btn btn-primary btn-sm">
+            <button type="submit" className="btn-q-a">
               Add & Log
             </button>
             <button
@@ -446,7 +446,7 @@ export default function NutritionPreview() {
                 setShowQuickAdd(false);
                 setQuickAddName('');
               }}
-              className="btn btn-ghost btn-sm"
+              className="btn-q-a"
             >
               Cancel
             </button>

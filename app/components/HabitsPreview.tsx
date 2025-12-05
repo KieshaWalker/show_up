@@ -391,10 +391,10 @@ export default function HabitsPreview() {
               </select>
             </div>
 
-            <div className="flex flex-wrap gap-2 items-center text-sm">
-              <span className="text-xs uppercase tracking-wide text-gray-400">Priority color</span>
+            <div className="input-g flex flex-wrap gap-2 items-center text-sm">
+              <span className="input-g text-xs uppercase tracking-wide text-gray-400">Priority color</span>
               {colorChoices.map((choice) => (
-                <label key={choice.value} className={`flex items-center gap-1 px-2 py-1 rounded-md border cursor-pointer ${quickAddColor === choice.value ? 'border-white/60' : 'border-white/10'}`}>
+                <label key={choice.value} className={`input-g flex items-center gap-1 px-2 py-1 rounded-md border cursor-pointer ${quickAddColor === choice.value ? 'border-white/60' : 'border-white/10'}`}>
                   <input
                     type="radio"
                     name="priority-color"
@@ -404,7 +404,7 @@ export default function HabitsPreview() {
                     className="hidden"
                     required
                   />
-                  <span className="inline-block h-4 w-4 rounded-full" style={{ backgroundColor: choice.value }} />
+                  <span className="input-g inline-block h-4 w-4 rounded-full" style={{ backgroundColor: choice.value }} />
                   <span>{choice.label}</span>
                 </label>
               ))}

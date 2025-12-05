@@ -27,11 +27,9 @@ export async function GET() {
     `;
 
     const result = await pool.query(query, [user.id]);
-    const foodItems = result.rows;
+    const food = result.rows;
 
-    return NextResponse.json({ foodItems }); // this returns the food items in the response, but i want it to just log them
-
-    console.log("Fetched food items:", foodItems);
+    return NextResponse.json({ food });
   } catch (error) {
     console.error("Error fetching food items:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -95,23 +93,24 @@ export async function PUT(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const name = formData.get("name") as string;
-    const servingSize = formData.get("serving_size") as string;
-    const calories = parseInt(formData.get("calories") as string, 10);
-    const protein = parseFloat(formData.get("protein") as string);
-    const totalFat = parseFloat(formData.get("total_fat") as string);
-    const saturatedFat = parseFloat(formData.get("saturated_fat") as string);
-    const transFat = parseFloat(formData.get("trans_fat") as string);
-    const cholesterol = parseFloat(formData.get("cholesterol") as string);
-    const sodium = parseFloat(formData.get("sodium") as string);
-    const totalCarbohydrate = parseFloat(formData.get("total_carbohydrate") as string);
-    const dietaryFiber = parseFloat(formData.get("dietary_fiber") as string);
-    const totalSugars = parseFloat(formData.get("total_sugars") as string);
-    const addedSugars = parseFloat(formData.get("added_sugars") as string);
-    const vitaminD = parseFloat(formData.get("vitamin_d") as string);
-    const calcium = parseFloat(formData.get("calcium") as string);
-    const iron = parseFloat(formData.get("iron") as string);
-    const potassium = parseFloat(formData.get("potassium") as string);
+    const get = (key: string) => (formData as any).get(key) as FormDataEntryValue | null;
+    const name = get("name") as string;
+    const servingSize = get("serving_size") as string;
+    const calories = parseInt(get("calories") as string, 10);
+    const protein = parseFloat(get("protein") as string);
+    const totalFat = parseFloat(get("total_fat") as string);
+    const saturatedFat = parseFloat(get("saturated_fat") as string);
+    const transFat = parseFloat(get("trans_fat") as string);
+    const cholesterol = parseFloat(get("cholesterol") as string);
+    const sodium = parseFloat(get("sodium") as string);
+    const totalCarbohydrate = parseFloat(get("total_carbohydrate") as string);
+    const dietaryFiber = parseFloat(get("dietary_fiber") as string);
+    const totalSugars = parseFloat(get("total_sugars") as string);
+    const addedSugars = parseFloat(get("added_sugars") as string);
+    const vitaminD = parseFloat(get("vitamin_d") as string);
+    const calcium = parseFloat(get("calcium") as string);
+    const iron = parseFloat(get("iron") as string);
+    const potassium = parseFloat(get("potassium") as string);
 
     const pool = getPool();
 
