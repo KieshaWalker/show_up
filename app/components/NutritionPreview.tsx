@@ -128,6 +128,7 @@ export default function NutritionPreview() {
     }
   };
 
+
   const fetchFoodUsageStats = async () => {
     try {
       // Get all nutrition logs to calculate usage statistics
@@ -160,6 +161,7 @@ export default function NutritionPreview() {
       console.error("Error fetching food usage stats:", error);
     }
   };
+  console.log('Food Usage Stats:', foodUsageStats);
 
   /**
    * Fetch today's nutrition logs
@@ -257,6 +259,7 @@ export default function NutritionPreview() {
       console.error('Error logging food:', error);
     }
   };
+  console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardData });
 
   /**
    * Handle quick-add food form submission
@@ -309,7 +312,7 @@ export default function NutritionPreview() {
       console.error('Error adding food item:', error);
     }
   };
-
+console.log('stats', foodUsageStats.length) 
 console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardData });
 
   /**

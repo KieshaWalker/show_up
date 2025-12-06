@@ -62,8 +62,9 @@ export default async function Home() {
         <h1 className="page-t">ShowUp, because momentum matters</h1>
 
         {/* Dashboard preview components */}
-        <div className="fade-in-up" style={{ animationDelay: "0.1s" }}>
+        <div className="dashboard-stack fade-in-up" style={{ animationDelay: "0.1s" }}>
           {featuringContent}
+          <div className="divider" />
           <NutritionPreview />
           <CalendarPreview />
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 type HabitBubble = {
   id: number;
   title: string;
@@ -13,6 +14,7 @@ type HabitBubble = {
 };
 
 export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, displayName }: { today: string; startOfWeek: string; endOfWeek: string; habits: HabitBubble[]; displayName?: string }) {
+  const router = useRouter();
   const [items, setItems] = useState<HabitBubble[]>(habits);
   const [savingId, setSavingId] = useState<number | null>(null);
 
@@ -48,6 +50,7 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
           };
         })
       );
+      router.refresh(); // ensure server data (weekly counts, today state) is persisted beyond session
     } finally {
       setSavingId(null);
     }
