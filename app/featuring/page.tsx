@@ -14,6 +14,10 @@ import { getPool } from '../db';
 import { authenticateUser } from '../utils/auth';
 import HabitsBubbles from './HabitsBubbles';
 
+// This page reads authentication cookies; force dynamic rendering to avoid static errors.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 /**
  * GET - Retrieve dashboard data
  *

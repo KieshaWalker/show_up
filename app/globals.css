@@ -1370,6 +1370,7 @@ h3, p {
   margin: 0 0 var(--spacing-xs) 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: inherit;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
