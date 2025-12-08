@@ -21,6 +21,7 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
   const totalTarget = items.reduce((sum, h) => sum + h.weeklyTarget, 0);
   const totalCompleted = items.reduce((sum, h) => sum + h.weeklyCompleted, 0);
   const progress = totalTarget > 0 ? Math.min((totalCompleted / totalTarget) * 100, 100) : 0;
+  const visibleItems = items.filter((h) => !h.completedToday);
 
   const toggleToday = async (habit: HabitBubble) => {
     if (savingId !== null) return; // avoid double-clicks
@@ -57,14 +58,11 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
   };
 
   return (
-    <div className="bubbles">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div>
+        <div className="glass-card calendar-preview">
+
           <h2 className="b-title" style={{ marginTop: 16 }}>{displayName || "you"}</h2>
-          <p className="b-p">Week {startOfWeek} → {endOfWeek}</p>
-        </div>
-        <p className="b-a">Consistency beats intensity</p>
-      </div>
+          <p className="z">Week {startOfWeek} → {endOfWeek}</p>
+        <p className="z">Consistency beats intensity</p>
       <div className="bubble-progress-bar ">
         <div className="flex items-center justify-between text-sm text-gray-200">
           <span>Total target: <strong className="text-white">{totalTarget}</strong></span>
@@ -79,8 +77,11 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
         </div>
         <div className="text-right text-xs text-gray-300">{progress.toFixed(0)}% of weekly possible habits</div>
       </div>
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {items.map((habit) => {
+      <div className="calendar-stats">
+        {visibleItems.length === 0 && (
+          <p className="text-sm text-gray-300">All habits done for today. They will return when a new day starts or when weekly slots remain.</p>
+        )}
+        {visibleItems.map((habit) => {
           const isActive = habit.completedToday;
           const bubbleColor = habit.color || "#7cf4ff";
           return (
@@ -96,28 +97,31 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
               }}
               aria-pressed={isActive}
             >
-              <div className="flex items-center gap-2">
+              <div className="stat-item">
                 <span
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold"
+                  className="inline-flex h-auto w-auto items-center justify-center rounded-full text-sm font-semibold"
                   style={{ background: isActive ? "#4b5563" : bubbleColor, color: isActive ? "#e5e7eb" : "#05060a" }}
                 >
+
                   {habit.title.slice(0, 2).toUpperCase()}
                 </span>
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-gray-400">{habit.frequency.replace(/-/g, " ")}</p>
-                  <p className="text-base font-semibold" style={{ letterSpacing: "-0.01em" }}>{habit.title}</p>
+                  <p className="text-xs tracking-wide text-white">({habit.frequency.replace(/-/g, " ")})</p>
+                  <p className="w-auto h-auto text-base font-semibold text-white" style={{ letterSpacing: "-0.01em" }}>{habit.title}</p>
                 </div>
               </div>
-              <div className="flex gap-4 text-xs text-gray-300">
-                <span>Target: <strong className="text-white">{habit.weeklyTarget}</strong></span>
-                <span>Done: <strong className="text-white">{habit.weeklyCompleted}</strong></span>
-                <span>Remaining: <strong className="text-white">{habit.remainingThisWeek}</strong></span>
+              <div className="grid gap-1 text-xs text-gray-300">
+                <span>Target: <strong className="text-gray-300">{habit.weeklyTarget}</strong></span>
+                <span>Done: <strong className="text-gray-300">{habit.weeklyCompleted}</strong></span>
+                <span>Remaining: <strong className="text-gray-300">{habit.remainingThisWeek}</strong></span>
               </div>
               {isActive && <p className="text-xs text-emerald-400">Marked done for today</p>}
             </button>
           );
         })}
-      </div>
+        </div>
+    
+ 
     </div>
   );
 }

@@ -57,14 +57,11 @@ export default async function Home() {
   return (
     <div className="main-content">
       <div className="content-container">
-      
-        {/* Main dashboard title */}
-        <h1 className="page-t">ShowUp, because momentum matters</h1>
-
-        {/* Dashboard preview components */}
-        <div className="dashboard-stack fade-in-up" style={{ animationDelay: "0.1s" }}>
+          <div className="dashboard-stack fade-in-up" style={{ animationDelay: "0.1s" }}>
+              <div className="bubbles">
+                <h1 className="page-t">Momentum Matters</h1>
+                </div>
           {featuringContent}
-          <div className="divider" />
           <NutritionPreview />
           <CalendarPreview />
         </div>

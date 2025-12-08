@@ -116,11 +116,17 @@ export default async function featuring() {
     return acc;
   }, {});
 
-  const habitsWithRemaining = countedHabits.map((habit: any) => {
+    const completedTodaySet = new Set(
+      habitLogs
+        .filter((log: any) => log.completed && toDateKey(log.date) === todayStr)
+        .map((log: any) => log.habit_id)
+    );
+
+    const habitsWithRemaining = countedHabits.map((habit: any) => {
     const target = frequencyWeekMultiplier[habit.frequency];
     const done = weeklyCompletedCount[habit.id] || 0;
     const remaining = Math.max(target - done, 0);
-    const completedToday = weeklyLogs.some((log) => log.habit_id === habit.id && log.date === todayStr && log.completed);
+      const completedToday = completedTodaySet.has(habit.id);
     return { ...habit, weeklyTarget: target, weeklyCompleted: done, remainingThisWeek: remaining, completedToday };
   });
 
@@ -141,8 +147,7 @@ export default async function featuring() {
 
 
   return (
-    <div className="main-content">
-      <div className="c-container">
+      <div className="c">
         <HabitsBubbles
           today={todayStr}
           startOfWeek={startOfWeek.toISOString().slice(0, 10)}
@@ -151,7 +156,6 @@ export default async function featuring() {
           displayName={user.displayName || "you"}
         />
       </div>
-    </div>
   );
 
   } catch (error) {

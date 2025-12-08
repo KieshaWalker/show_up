@@ -80,10 +80,6 @@ export default async function DashboardPage() {
         const dateEaten = weeklyNutrition.map(log => toDateKey(log.date));
 
 
-        console.log("Weekly Dates Eaten:", dateEaten);
-        console.log("Weekly cals:", weeklyCalories);
-        console.log("Weekly Nutrition Names:", weeklyNutritionName);
-        console.log("Weekly Nutrition:", weeklyNutrition);
 
 
     // Calculate summary statistics

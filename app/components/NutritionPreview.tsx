@@ -348,7 +348,7 @@ console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardDat
   }
 
   return (
-    <div className="glass-card nutrition-preview">
+    <div className="glass-card calendar-preview">
       {/* Header section with title and action buttons */}
       <div className="preview-header">
         
@@ -367,16 +367,14 @@ console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardDat
         </div>
         
       </div>
-<div className="nut-title">
       {/* Daily calorie summary display */}
       <div className="calories-summary">
-        <div className="calories-number">{getTodayCalories()}</div>
-        <div className="calories-label">calories today</div>
+        <div className="pantry-title">{getTodayCalories()}</div>
+        <div className="pantry-title">calories today</div>
       </div>
 
       
       {/* Suggestion Card - Appears when habits need weekly completion and food data exists */}
-        <div className="suggestion-card">
           <p className="suggestion-subtitle">Your favorite foods are ready:</p>
           <div className="suggestion-foods">
             {foodUsageStats.slice(0, 3).map((food) => (
@@ -385,19 +383,16 @@ console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardDat
                 onClick={() => logFoodConsumption(food.id, 1)}
                 className="suggestion-food-button"
               >
-                <span className="food-n">{food.name}</span>
-                <span className="food-c">{food.calories} cal</span>
-                <span className="food-c">{food.count}x logged</span>
+                <span className="food-name">{food.name}</span>
+                <span className="food-calories">{food.calories} cal</span>
+                <span className="food-calories">{food.count}x logged</span>
               </button>
             ))}
           </div>
-        </div>
-        </div>
+       
     
-      {/* Pantry items quick add and button to see more*/}
-      <div className="pantry-section">
         <h4 className="pantry-title">Pantry</h4>
-        <div className="pantry-foods">
+        <div className="suggestion-foods">
           {Array.from(pantryMap.values()).slice(0, 8).map((food) => (
             <button
               key={food.id}
@@ -407,26 +402,8 @@ console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardDat
               <span className="food-name">{food.name}</span>
               <span className="food-calories">{food.calories} cal</span>
             </button>
-          ))}
-        </div>
-     
-          
-      </div>
-
-      {/* Weekly Nutrition Summary */}
-      {dashboardData && dashboardData.weeklyCalories > 0 && (
-        <div className="weekly-summary">
-          <h4 className="activity-title">Weekly Nutrition</h4>
-          <div className="stat-item">
-            <div className="stat-number">{dashboardData.weeklyCalories}</div>
-            <div className="stat-label">Total Calories</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-number">{dashboardData.caloriesYesterdayTotal}</div>
-            <div className="stat-label">Yesterday's Calories</div>
-          </div>
-        </div>
-      )}
+          ))}     
+           </div>
 
       {/* Quick add food form - conditionally rendered */}
       {showQuickAdd && (
