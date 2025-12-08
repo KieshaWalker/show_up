@@ -173,9 +173,9 @@ export default function HabitsPage() {
   return (
     <div className="habit-section">
       <div className="content-container">
-        <div className="card">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="hpage-title">Your Habits</h1>
+        <div className="card flex flex-col justify-center mt-10">
+          <div className="flex justify-between items-center">
+            <h1 className="page-t">Your Habits</h1>
             <Link href="/habits/add" className="btn btn-primary">
               Add New Habit
             </Link>

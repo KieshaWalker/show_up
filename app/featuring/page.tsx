@@ -130,9 +130,6 @@ export default async function featuring() {
     return { ...habit, weeklyTarget: target, weeklyCompleted: done, remainingThisWeek: remaining, completedToday };
   });
 
-  console.log("Total Possible Habits This Week:", totalPossibleHabitsThisWeek);
-  console.log('weekly remaining per habit', habitsWithRemaining.map((h: any) => ({ title: h.title, remaining: h.remainingThisWeek, target: h.weeklyTarget, done: h.weeklyCompleted, today: h.completedToday })));
-
   // if user clicks on one of the total possible habits this week, it marks it as completed and removes it from that list and shows it as completed
   const completedHabitsThisWeek = habitLogs.filter((log: any) => {
     const logDateKey = toDateKey(log.date);
@@ -142,8 +139,6 @@ export default async function featuring() {
 
   const uniqueCompletedHabitIds = Array.from(new Set(completedHabitsThisWeek.map((log: any) => log.habit_id)));
   const totalCompletedHabitsThisWeek = uniqueCompletedHabitIds.length;
-
-  console.log("Total Completed Habits This Week:", totalCompletedHabitsThisWeek);
 
 
   return (
