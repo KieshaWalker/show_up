@@ -23,11 +23,10 @@
  */
 :root {
   /* Apple-inspired color palette */
-  --background: #626554;
   --backgroundgradial: radial-gradient(circle, #3900a383, #7949499f, #1324c47e);          /* Warm green background */
   --surface: #88663f4f;            /* Semi-transparent white surfaces */
-  --modal-surface: #5c4949;      /* Modal surface color */
- --surface-secondary: #f8f9fa41;  /* Secondary surface color */
+  --modal-surface: #6872a0;      /* Modal surface color */
+ --surface-secondary: #ffffff75;  /* Secondary surface color */
   --text-primary: #f7f7fa;         /* Primary text color */
   --text-secondary: #f1efef;       /* Secondary text color */
   --text-tertiary: #010120;        /* Tertiary text color */
@@ -38,12 +37,41 @@
   --error: #ff3a3052;              /* Error state color */
   --border: rgba(0, 0, 0, 0.1);   /* Border color */
   --backgroundgradialtwo: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  --activitybackground: rgba(0, 68, 255, 0.5);
+  --habitsactbackground: rgba(52, 199, 89, 0.5);
+
 
 
   /* Glassmorphism effects */
   --glass-bg: rgba(255, 255, 255, 0.26);     /* Glass background */
   --glass-border: rgba(248, 240, 240, 0.158);  /* Glass border */
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Glass shadow */
+  --glass-button: rgba(255, 255, 255, 0.9); /* Glass button background */
+
+
+
+  /* button colors */
+  --btnsmallbg: rgba(255, 255, 255, 0.2);
+  --btnsmallborder: rgba(255, 255, 255, 0.3);
+  --btnsmallhoverbg: rgba(255, 255, 255, 0.3);
+  --btnsmallhoverborder: rgba(255, 255, 255, 0.4);
+  --btnlargebg: rgba(255, 255, 255, 0.3);
+  --btnlargeborder: rgba(255, 255, 255, 0.4);
+  --btnlargehhoverbg: rgba(255, 255, 255, 0.4);
+  --btnlargehhoverborder: rgba(255, 255, 255, 0.5);
+  --btnsecondarybg: rgba(255, 255, 255, 0.1);
+  --btnsecondaryborder: rgba(255, 255, 255, 0.2);
+  --btnsecondaryhoverbg: rgba(255, 255, 255, 0.2);
+  --btnsecondaryhoverborder: rgba(255, 255, 255, 0.3);
+
+
+
+
+
+
+
+
+
 
   /* Spacing scale */
   --spacing-xs: 4px;
@@ -163,12 +191,12 @@ body {
   background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  border-color: var(--btnlargehhoverborder);
 }
 
 .btn-secondary {
-  background: var(--surface-secondary);
-  color: var(--text-primary);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--btnsecondaryborder);
+  
 }
 
 .btn-secondary:hover {
@@ -220,7 +248,7 @@ body {
 }
 
 .glass-button:hover, .hero-cta:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--glass-button);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
@@ -254,12 +282,12 @@ body {
 
 
 .hero-subtitle {
-    line-height: 10%;
-    max-width: 480px;
-    margin-left: 10rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  line-height: 10%;
+  max-width: 480px;
+  margin-left: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--spacing-xl);
   font-weight: 600;
   background-image: linear-gradient(90deg, #13818b, #a615fa, #6d492f, #ef4444, #0a4449);
@@ -269,6 +297,7 @@ body {
   background-clip: text;
   color: transparent;
   animation: pageTShimmer 3.5s ease-in-out infinite;
+
 }
 @keyframes pageTShimmer {
   0%, 100% { background-position: 0% 50%; }
@@ -347,12 +376,12 @@ body {
   padding: 8px;
   border-radius: 6px;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
   border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .hamburger-menu:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--glass-button);
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(1) {
@@ -542,9 +571,7 @@ display: block;
   box-shadow: var(--shadow-md);
   border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  p {
-    color: var(--text-primary);
-  }
+ 
 }
 
 .habit-card:hover {
@@ -663,6 +690,15 @@ display: block;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
+  .div {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    justify-content: center;
+    align-items: center;
+    padding-right: 8rem;
+    
+  }
+ 
 
 .form-input::placeholder {
   color: var(--text-tertiary);
@@ -689,6 +725,54 @@ display: block;
 .fade-in-up:nth-child(3) { animation-delay: 0.3s; }
 
 /* Responsive Design */
+@media screen { 
+  .body {
+    overflow: hidden;
+    max-width: 100vw;
+    max-height: 100vh;
+
+  } 
+    .html {
+    display: flex;
+    justify-content: center;
+    justify-items: center;}
+  
+  *{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+
+  }
+  .reactive {
+   font-size: .09rem;
+   margin: 0;
+    width: fit-content;
+    height: fit-content;
+    padding: 1rem;  
+  }
+  .suggestion-foods, .suggestion-food-button {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: .01rem;
+    margin: .01rem;
+    width: 100vh; 
+
+  }
+
+  .food-calories {
+    font-size: 0.5rem;
+  }
+  .food-name {
+    font-size: 0.7rem;
+  }
+  .preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+  
+}
 @media (max-width: 768px) {
   .body {
     overflow: hidden;
@@ -709,7 +793,8 @@ display: block;
   }
   .suggestion-foods, .suggestion-food-button {
     display: grid;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
+    width: fit-content;
   }
   .glass-card {
     margin-top: 1rem;
@@ -786,7 +871,7 @@ display: block;
   }
   .suggestion-foods, .suggestion-food-button {
     display: grid;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: 1fr 1fr;
   }
   .glass-card {
     margin-top: 1rem;
@@ -904,8 +989,12 @@ display: block;
   }
 
   .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: auto auto auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: auto;
+    width: 100%;
+  
   }
   .glass-card {
     margin-top: 1rem;
@@ -946,7 +1035,17 @@ display: block;
   }
   .suggestion-foods, .suggestion-food-button {
     display: grid;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+    align-items: center;
+    align-self: center;
+    justify-content: center;
+    gap: .8rem;
+  }
+  .div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
   }
   .glass-card {
     margin-top: 1rem;
@@ -971,13 +1070,6 @@ display: block;
   }
 }
 
-/* Utility Classes */
-.text-gradient {
-  background: linear-gradient(135deg, var(--cream) 0%, var(--light-brown) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
 
 .shadow-glow {
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
@@ -1027,7 +1119,7 @@ h3, p {
 }
 
 .add-habit-container {
-  background: none;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
@@ -1264,12 +1356,7 @@ h3, p {
 }
 
 /* Utility Classes */
-.text-gradient {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+
 
 .shadow-glow {
   box-shadow: 0 0 20px rgba(0, 122, 255, 0.2);
@@ -1464,18 +1551,27 @@ h3, p {
 .calendar-month {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-primary);
   margin: 0 var(--spacing-lg);
   min-width: 200px;
   text-align: center;
+  background-image: linear-gradient(90deg, #494d60, #943204c4, #353838, #13818bda);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: pageTShimmer 3.5s ease-in-out infinite;
 }
+
+
+
 
 .calendar-container {
 
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--btnsecondaryborder);
   width: auto;
 }
 
@@ -1489,7 +1585,7 @@ h3, p {
 .calendar-header-cell {
   padding: var(--spacing-md);
   text-align: center;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text-secondary);
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -1563,11 +1659,11 @@ h3, p {
 }
 
 .activity-indicator.habits {
-  background: rgba(52, 199, 89, 0.9);
+  background: var(--habitsactbackground);
 }
 
 .activity-indicator.nutrition {
-  background: rgba(255, 149, 0, 0.9);
+  background: var(--activitybackground)
 }
 
 .activity-count {
@@ -1722,7 +1818,7 @@ h3, p {
 
 .calendar-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: auto auto auto;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
 }
@@ -1791,12 +1887,12 @@ h3, p {
 }
 
 .activity-badge.habits {
-  background: rgba(52, 199, 89, 0.9);
+  background: var(--habitsactbackground);
   color: white;
 }
 
 .activity-badge.nutrition {
-  background: rgba(255, 149, 0, 0.9);
+  background: var(--activitybackground);
   color: white;
 }
 
@@ -2077,7 +2173,7 @@ h3, p {
 
 .suggestion-foods {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: auto auto;
   gap: var(--spacing-sm);
   color: var(--text-primary);
 }
@@ -2322,15 +2418,17 @@ opacity: 1;
 
   
 .reactive {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-  gap: var(--spacing-md);
+ display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   box-shadow: 5px 5px 30px rgb(0, 0, 0);
   border: 1px solid var(--glass-border);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+  width: 100%;
 }
 
 .stat-item {
@@ -2366,17 +2464,18 @@ opacity: 1;
 .page-t, .b-title, .activity-title, .pantry-title {
   position: relative;
   font-size: 2rem;
-  color: var(--text-primary);
   text-align: center;
   margin: 2rem 0;
   letter-spacing: -0.01em;
-  background: linear-gradient(90deg, var(--text-primary), var(--accent), var(--text-primary));
+  background-image: linear-gradient(90deg, #494d60, #da8259c4, #8b9292, #13818bda);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
   animation: pageTShimmer 3.5s ease-in-out infinite;
+  text-shadow: #0000002c 1px 1px 1px;
+  font-weight: 700;
 }
 
 @keyframes pageTShimmer {

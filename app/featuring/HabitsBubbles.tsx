@@ -97,7 +97,7 @@ export default function HabitsBubbles({ today, startOfWeek, endOfWeek, habits, d
               }}
               aria-pressed={isActive}
             >
-              <div className="stat-item">
+              <div className="stat">
                 <span
                   className="inline-flex h-auto w-auto items-center justify-center rounded-full text-sm font-semibold"
                   style={{ background: isActive ? "#4b5563" : bubbleColor, color: isActive ? "#e5e7eb" : "#05060a" }}

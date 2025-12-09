@@ -376,6 +376,7 @@ console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardDat
       
       {/* Suggestion Card - Appears when habits need weekly completion and food data exists */}
           <p className="suggestion-subtitle">Your favorite foods are ready:</p>
+          <div className="div">
           <div className="suggestion-foods">
             {foodUsageStats.slice(0, 3).map((food) => (
               <button
@@ -389,9 +390,11 @@ console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardDat
               </button>
             ))}
           </div>
+          </div>
        
     
         <h4 className="pantry-title">Pantry</h4>
+        <div className="div">
         <div className="suggestion-foods">
           {Array.from(pantryMap.values()).slice(0, 8).map((food) => (
             <button
@@ -404,6 +407,7 @@ console.log('NutritionPreview render:', { foodItems, nutritionLogs, dashboardDat
             </button>
           ))}     
            </div>
+        </div>
 
       {/* Quick add food form - conditionally rendered */}
       {showQuickAdd && (
