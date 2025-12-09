@@ -27,7 +27,7 @@
   --surface: #88663f4f;            /* Semi-transparent white surfaces */
   --modal-surface: #6872a0;      /* Modal surface color */
  --surface-secondary: #ffffff75;  /* Secondary surface color */
-  --text-primary: #f7f7fa;         /* Primary text color */
+  --text-primary: #ffffffc7;         /* Primary text color */
   --text-secondary: #f1efef;       /* Secondary text color */
   --text-tertiary: #010120;        /* Tertiary text color */
   --accent: #007bff36;             /* Accent color for links/buttons */
@@ -166,7 +166,7 @@ body {
 }
 
 /* Button Styles */
-.btn {
+.btn, .btng {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -179,7 +179,16 @@ body {
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
+  white-space: nowrap; 
+  
+}
+
+.btng {
+  background: var(--accent);
+  color: white;
+  border: none;
+  margin-bottom: var(--spacing-sm);
+  width: 100%;
 }
 
 .btn-primary {
@@ -196,8 +205,7 @@ body {
 
 .btn-secondary {
   border: 1px solid var(--btnsecondaryborder);
-  
-}
+  }
 
 .btn-secondary:hover {
   background: var(--surface);
@@ -205,7 +213,6 @@ body {
 }
 
 .btn-ghost {
-  background: transparent;
   color: var(--text-secondary);
 }
 
@@ -223,8 +230,8 @@ body {
 .btn-sm {
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: 0.875rem;
-  background-color: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: var(--accent);
+  border: 2px solid var(--glass-border);
 }
 
 /* Legacy button classes for compatibility */
@@ -743,28 +750,7 @@ display: block;
   padding: 0;
 
   }
-  .reactive {
-   font-size: .09rem;
-   margin: 0;
-    width: fit-content;
-    height: fit-content;
-    padding: 1rem;  
-  }
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    gap: .01rem;
-    margin: .01rem;
-    width: 100vh; 
 
-  }
-
-  .food-calories {
-    font-size: 0.5rem;
-  }
-  .food-name {
-    font-size: 0.7rem;
-  }
   .preview-header {
   display: flex;
   justify-content: space-between;
@@ -791,17 +777,9 @@ display: block;
   padding: 0;
 
   }
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: auto auto;
-    width: fit-content;
-  }
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
-  }
-  .reactive {
-   font-size: .09rem;
   }
 
 
@@ -869,18 +847,10 @@ display: block;
   padding: 0;
 
   }
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-  }
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
   }
-  .reactive {
-   font-size: .09rem;
-  }
-
 
   .hero-content {
     padding: 2rem 1rem;
@@ -984,18 +954,7 @@ display: block;
   padding: 0;
 
   }
-  .reactive {
-   font-size: .09rem;
-  }
 
-  .suggestion-foods, .suggestion-food-button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: auto;
-    width: 100%;
-  
-  }
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
@@ -1033,15 +992,6 @@ display: block;
   padding: 0;
 
   }
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    width: 100%;
-    align-items: center;
-    align-self: center;
-    justify-content: center;
-    gap: .8rem;
-  }
   .div {
     display: flex;
     flex-direction: row;
@@ -1050,9 +1000,6 @@ display: block;
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
-  }
-  .reactive {
-   font-size: .09rem;
   }
 
 
@@ -1378,16 +1325,9 @@ h3, p {
   padding: 0;
 
   }
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: auto auto auto;
-  }
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
-  }
-  .reactive {
-   font-size: .09rem;
   }
 
 
@@ -1719,16 +1659,9 @@ h3, p {
   padding: 0;
 
   }
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: auto auto auto;
-  }
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
-  }
-  .reactive {
-   font-size: .09rem;
   }
 
 
@@ -1791,14 +1724,6 @@ h3, p {
   padding: 0;
 
   }
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: auto auto auto;
-  }
-  .reactive {
-   font-size: .09rem;
-  }
-
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
@@ -1918,15 +1843,6 @@ h3, p {
   padding: 0;
 
   }
-  .suggestion-foods, .suggestion-food-button {
-    max-width: 9em;
-    display: grid;
-    grid-template-rows: auto auto auto;
-  }
-  .reactive {
-   font-size: .09rem;
-  }
-
   .glass-card {
     margin-top: 1rem;
     margin-bottom: 1rem ;
@@ -1961,15 +1877,6 @@ h3, p {
   margin: 0;
   padding: 0;
 
-  }
-.reactive {
-   font-size: .09rem;
-  }
-
-  
-  .suggestion-foods, .suggestion-food-button {
-    display: grid;
-    grid-template-rows: auto auto auto;
   }
   .glass-card {
     margin-top: 1rem;
@@ -2173,9 +2080,8 @@ h3, p {
 
 .suggestion-foods {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: var(--spacing-sm);
-  color: var(--text-primary);
 }
 
 .suggestion-food-button {
@@ -2192,6 +2098,22 @@ h3, p {
   color: var(--text-primary);
 }
 
+@media (max-width: 768px) {
+  .suggestion-foods {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .suggestion-foods {
+    grid-template-columns: 1fr;
+  }
+
+  .suggestion-food-button {
+    width: 100%;
+  }
+}
+
 .suggestion-food-button .food-n,
 .suggestion-food-button .food-c {
   color: var(--text-primary);
@@ -2203,12 +2125,28 @@ h3, p {
   box-shadow: var(--shadow-sm);
 }
 
+.fanpack {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--coolshadow);
+  border: 3px solid var(--glass-bg);
+  border-radius: var(--radius-xl);
+  padding: 2px var(--spacing-xs);
+  margin-bottom: 5rem;
+}
 
 
+.food-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
 .food-calories {
-  font-size: 0.875rem;
-  opacity: 0.9;
+  font-size: 1rem;
   margin-right: var(--spacing-md);
+  color: var(--accent);
+  font-weight: 600;
+  text-shadow: #ffffff63 1px 0px 8px;
 }
 
 .food-count {
@@ -2349,12 +2287,7 @@ opacity: 1;
     gap: var(--spacing-md);
     
   }
-  .food-calories {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--accent);
-  }
- 
+
  
 .weekly-summary, .pantry-section {
   margin-top: var(--spacing-2xl);
@@ -2396,13 +2329,7 @@ opacity: 1;
     gap: var(--spacing-md);
     
   }
-  .food-calories {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--accent);
-  }
-
-
+ 
 
 
 .glass-card, .bubbles {

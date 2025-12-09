@@ -161,7 +161,7 @@ export default function CalendarPreview() {
       {/* Header section with title and navigation link */}
       <div className="preview-h">
         <h3 className="pantry-title">This Month's Activity</h3>
-        <Link href="/calendar" className="btn btn-ghost btn-sm">
+        <Link href="/calendar" className="btng">
           View Full Calendar
         </Link>
       </div>

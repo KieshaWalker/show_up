@@ -166,7 +166,7 @@ export default function NutritionPage() {
   if (loading) {
     return (
       <div className="nutrition-page-container">
-        <h1 className="nutrition-page-title">Nutrition Tracker</h1>
+        <h1 className="preview-title">Nutrition Tracker</h1>
         <p>Loading...</p>
       </div>
     );
@@ -174,7 +174,9 @@ export default function NutritionPage() {
 
   return (
     <div className="nutrition-page-container">
-      <h1 className="nutrition-page-title">Nutrition Tracker</h1>
+      <div className="fanpack">
+      <h1 className="pantry-title">Nutrition Tracker</h1>
+      </div>
 
       <Link href="/nutrition/add" className="glass-button">
         Add New Food Item
