@@ -172,7 +172,7 @@ export default function HabitsPage() {
 
   return (
     <div className="habit-section">
-      <div className="content-container">
+      <div className="card flex flex-col">
         <div className="card flex flex-col justify-center mt-10">
           <div className="flex justify-between items-center">
             <h1 className="page-t">Your Habits</h1>
@@ -201,9 +201,9 @@ export default function HabitsPage() {
               </Link>
             </div>
           ) : (
-            <div className="habits-grid">
+            <div className="h">
               {habits.map((habit) => (
-                <div key={habit.id} className="habit-card">
+                <div key={habit.id} className="habit-card glass-card p-4">
                   <div className="flex items-center gap-3 mb-3">
                   
                     <h3 className="habit-title">{habit.title}</h3>
@@ -216,13 +216,13 @@ export default function HabitsPage() {
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => handleEditHabit(habit)}
-                      className="btn btn-secondary btn-sm"
+                      className="btn btn-primary"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteHabit(habit.id)}
-                      className="btn btn-ghost btn-sm text-error hover:bg-red-50"
+                      className="btn btn-ghost text-error hover:bg-red-50"
                     >
                       Delete
                     </button>

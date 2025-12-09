@@ -28,9 +28,9 @@
   --surface: #88663f4f;            /* Semi-transparent white surfaces */
   --modal-surface: #5c4949;      /* Modal surface color */
  --surface-secondary: #f8f9fa41;  /* Secondary surface color */
-  --text-primary: #1d1d1f;         /* Primary text color */
-  --text-secondary: #0c0c0c;       /* Secondary text color */
-  --text-tertiary: #19191b;        /* Tertiary text color */
+  --text-primary: #f7f7fa;         /* Primary text color */
+  --text-secondary: #f1efef;       /* Secondary text color */
+  --text-tertiary: #010120;        /* Tertiary text color */
   --accent: #007bff36;             /* Accent color for links/buttons */
   --accent-hover: #0055cc3f;       /* Hover state for accent */
   --success: #0c201144;            /* Success state color */
@@ -193,6 +193,8 @@ body {
 .btn-sm {
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: 0.875rem;
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
 }
 
 /* Legacy button classes for compatibility */
@@ -1414,9 +1416,13 @@ h3, p {
 
 /* Calendar Styles */
 .calendar-page {
-  padding: var(--spacing-xl);
-  max-width: 1200px;
+  max-width: auto;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
 }
 
 .calendar-header {
@@ -1426,6 +1432,7 @@ h3, p {
   margin-bottom: var(--spacing-xl);
   flex-wrap: wrap;
   gap: var(--spacing-md);
+  margin-top: var(--spacing-2xl);
 }
 
 .calendar-navigation {
@@ -1444,17 +1451,19 @@ h3, p {
 }
 
 .calendar-container {
-  background: var(--surface);
+
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
+  width: auto;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: var(--spacing-sm);
+  width: auto;
 }
 
 .calendar-header-cell {
@@ -1474,7 +1483,7 @@ h3, p {
   padding: var(--spacing-sm);
   display: flex;
   flex-direction: column;
-  background: var(--surface);
+  background: var(--glass-bg);
   transition: all 0.2s ease;
   min-height: 100px;
 }
@@ -1512,6 +1521,7 @@ h3, p {
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: var(--spacing-xs);
+  
 }
 
 .calendar-day-content {
@@ -1910,6 +1920,12 @@ h3, p {
   font-size: 1rem;
 }
 
+.habit-section {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  margin-top: 2rem;
+}
 
 .nutrition-preview .food-log {
   margin-bottom: var(--spacing-lg);

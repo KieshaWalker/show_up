@@ -114,7 +114,7 @@ export default function CalendarPage() {
   return (
     <div className="calendar-page">
       <div className="calendar-header">
-        <h1 className="page-title">Activity Calendar</h1>
+        <h1 className="page-t">Activity Calendar</h1>
         <div className="calendar-navigation">
           <button
             className="btn btn-secondary"
