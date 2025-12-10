@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { redirect } from 'next/navigation';
 
 /**
  * Interface for calendar statistics data structure
@@ -17,11 +18,10 @@ interface CalendarStats {
     habits: number;                 // Number of habits completed that day
     nutrition: number;              // Number of nutrition entries that day
   }>;
-
   calendarData: Record<string, {
     date: string;
     habits: Array<{ id: number; title: string; completed: boolean; date: string }>;
-    nutrition: Array<{ id: number; name: string; calories: number; quantity: number; serving_size: string; date: string }>;
+    nutrition: Array<{ id: number; name: string; calories: number; quantity: number; serving_size?: string; date: string }>;
   }>;
   
   // New data from dashboard
@@ -48,15 +48,15 @@ interface CalendarStats {
  *
  * This component provides a quick overview of user activity and serves as
  * an entry point to the full calendar view.
- *
+ *@param request - Next.js request object
  * @returns JSX.Element - The calendar preview card component
  */
-export default function CalendarPreview() {
+export default async function dash() {
   // State management for calendar statistics, loading, and error states
   const [stats, setStats] = useState<CalendarStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [activeDayIndex, setActiveDayIndex] = useState(0);
 
   // Fetch calendar stats on component mount
   useEffect(() => {
@@ -74,6 +74,7 @@ export default function CalendarPreview() {
 
       // Get current month data from calendar API
       const now = new Date();
+      const todayKey = now.toISOString().split('T')[0];
       const calendarResponse = await fetch(`/api/calendar?year=${now.getFullYear()}&month=${now.getMonth() + 1}`);
 
       if (!calendarResponse.ok) {
@@ -90,9 +91,41 @@ export default function CalendarPreview() {
       }
 
       const dashboardData = await dashboardResponse.json();
+      console.log("dashboardData:", dashboardData);
 
       // Process calendar data to extract recent activity
       const calData = calendarData.calendarData || {};
+
+      // Ensure today exists in calendar data using dashboard data, even if calendar query had no entries yet
+      if (!calData[todayKey]) {
+        calData[todayKey] = {
+          date: todayKey,
+          habits: [],
+          nutrition: []
+        };
+      }
+
+      // Merge today habits from dashboard
+      if (dashboardData.todayHabits?.length) {
+        calData[todayKey].habits = dashboardData.todayHabits.map((h: any) => ({
+          id: h.habit_id,
+          title: h.title,
+          completed: true,
+          date: h.date
+        }));
+      }
+
+      // Merge today nutrition from dashboard
+      if (dashboardData.nutritionLogs?.length) {
+        calData[todayKey].nutrition = dashboardData.nutritionLogs.map((n: any) => ({
+          id: n.id,
+          name: n.name,
+          calories: n.calories,
+          quantity: n.quantity,
+          serving_size: n.food_serving_size,
+          date: n.date
+        }));
+      }
       const dates = Object.keys(calData);
 
       // Sort dates descending and take last 7 days
@@ -126,6 +159,7 @@ export default function CalendarPreview() {
         weeklyCalories: dashboardData.weeklyCalories || 0,
         caloriesYesterdayTotal: dashboardData.caloriesYesterdayTotal || 0
       });
+      setActiveDayIndex(0);
     } catch (error) {
       console.error('Error fetching calendar stats:', error);
       setError('Failed to load calendar stats.');
@@ -162,137 +196,123 @@ export default function CalendarPreview() {
   // Calculate recent activity count for the past 7 days
   const recentActivityCount = stats.recentActivity.reduce((sum, day) => sum + day.habits + day.nutrition, 0);
 
-  const selectedDayData = selectedDate ? stats.calendarData?.[selectedDate] : null;
+  const toDateKey = (value: string | number | Date) => new Date(value).toISOString().split('T')[0];
+
+  const matchDateWithHabitCompletions = (date: string) => {
+    return stats.todayHabits.filter(habit => toDateKey(habit.date) === date);
+    // Returns array of habits completed on the given date (YYYY-MM-DD)
+  };
+
+  console.log(matchDateWithHabitCompletions('2025-12-08'));
+
+  const handlePrev = () => {
+    setActiveDayIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleNext = () => {
+    setActiveDayIndex((prev) => Math.min(stats.recentActivity.length - 1, prev + 1));
+  };
+
+  const WeekSwipe = ({
+    recentActivity,
+    calendarData,
+    activeDayIndex,
+    onPrev,
+    onNext,
+    setActiveDayIndex,
+  }: {
+    recentActivity: CalendarStats['recentActivity'];
+    calendarData: CalendarStats['calendarData'];
+    activeDayIndex: number;
+    onPrev: () => void;
+    onNext: () => void;
+    setActiveDayIndex: React.Dispatch<React.SetStateAction<number>>;
+  }) => {
+    if (!recentActivity?.length) return null;
+    const active = recentActivity[activeDayIndex];
+    const dayData = active ? calendarData?.[active.date] : null;
+
+    return (
+      <div className="recent-activity" style={{ marginTop: '1rem', gridColumn:'span 2' }}>
+        <div className="preview-h" style={{ alignItems: 'center' }}>
+          <div style={{ display:'flex', gap:'0.5rem', alignItems:'center' }}>
+            <button className="btng" onClick={onPrev} disabled={activeDayIndex === 0} style={{ opacity: activeDayIndex === 0 ? 0.5 : 1 }}>←</button>
+            <span style={{ fontSize: '0.9rem' }}>
+              {active ? new Date(active.date).toLocaleDateString(undefined, { weekday: 'long' }) : ''}
+            </span>
+            <button className="btng" onClick={onNext} disabled={activeDayIndex === recentActivity.length - 1} style={{ opacity: activeDayIndex === recentActivity.length - 1 ? 0.5 : 1 }}>→</button>
+          </div>
+        </div>
+
+        {/* Active day card */}
+        {active && (
+          <div className="glass-card" style={{ marginTop: '0.5rem', padding: '0.75rem' }}>
+            <div className="activity-day" style={{ borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.4rem', marginBottom: '0.5rem' }}>
+              <div className="activity-date" style={{ width: 'fit-content', fontWeight:'bold' }}>
+                {new Date(active.date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+              </div>
+            </div>
+
+            {dayData?.habits?.length ? (
+              <div style={{ marginTop: '0.25rem' }}>
+                <ul className="activity-list" style={{ display:'grid', gap:'0.3rem', paddingLeft: 0 }}>
+                  {dayData.habits.map((habit) => (
+                    <li key={habit.id} className="activity-day" style={{ listStyle:'none', padding:'0.35rem 0', borderBottom:'1px solid var(--glass-border)' }}>
+                      <div className="activity-count">{habit.title}</div>
+                      <span className="activity-badge habits">{habit.completed ? 'Completed' : 'Pending'}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="error-text" style={{ marginTop: '0.25rem' }}>No habits logged.</p>
+            )}
+
+            {dayData?.nutrition?.length ? (
+              <div style={{ marginTop: '0.75rem' }}>
+                <h5 className="activity-title" style={{ marginBottom: '0.35rem' }}>Nutrition</h5>
+                <ul className="activity-list" style={{ display:'grid', gap:'0.3rem', paddingLeft: 0 }}>
+                  {dayData.nutrition.map((entry) => (
+                    <li key={entry.id} className="activity-day" style={{ listStyle:'none', padding:'0.35rem 0', borderBottom:'1px solid var(--glass-border)' }}>
+                      <div className="activity-count">{entry.name}</div>
+                      <span className="activity-badge nutrition">{entry.calories} kcal</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="error-text" style={{ marginTop: '0.25rem' }}>No nutrition logged.</p>
+            )}
+          </div>
+        )}
+
+       
+      </div>
+    );
+  };
+
 
   return (
-    <div className="glass-card calendar-preview">
-      <div className="nut-title">
-
+    <div className="glass-card calendar-preview" style={{display:'grid', gap:'1rem', gridTemplateColumns:'1fr 1fr'}}>
       {/* Header section with title and navigation link */}
-      <div className="preview-h">
-        <h3 className="pantry-title">This Month's Activity</h3>
-        <Link href="/calendar" className="btng">
-          View Full Calendar
-        </Link>
-      </div>
-      <div className="calendar-stats">
-        <div className="stat-item">
-          <div className="stat-number">{totalActivity}</div>
-          <div className="stat-label">This Month</div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-number">{stats.totalUniqueHabits}</div>
-          <div className="stat-label">Habits Created</div>
-        </div>
-        <div className="stat-item">
-          <div className="stat-number">{stats.totalUniqueFood}</div>
-          <div className="stat-label">Foods Added</div>
-        </div>
-      </div>
+    <div className="calendar-header" style={{gridColumn:'span 2'}}>
+      <h3 className="preview-title">Your Activity</h3>
+      <Link href="/calendar" className="btn btn-primary btn-sm">
+        View Full Calendar
+      </Link>
+    </div>
+ 
 
-      {stats.weeklyCalories > 0 && (
-        <div className="weekly-s">
-          <h4 className="activity-title">Weekly Nutrition</h4>
-          <div className="stat-item">
-            <div className="stat-number">{stats.weeklyCalories}</div>
-            <div className="stat-label">Total Calories</div>
-          </div>
-        </div>
-      )}
+      {/*week at a glance per day as swipeable cards*/}
+        <WeekSwipe
+          recentActivity={stats.recentActivity}
+          calendarData={stats.calendarData}
+          activeDayIndex={activeDayIndex}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          setActiveDayIndex={setActiveDayIndex}
+        />
 
-      {/* Recent activity timeline - shows last 3 active days */}
-      {recentActivityCount > 0 && (
-        <div className="recent-activity">
-          <h4 className="activity-title">Recent Activity</h4>
-          <div className="activity-timeline">
-            {stats.recentActivity.slice(0, 3).map((day, index) => {
-              const totalForDay = day.habits + day.nutrition;
-              // Skip days with no activity
-              if (totalForDay === 0) return null;
-
-              return (
-                <div
-                  key={day.date}
-                  className="activity-day"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedDate(day.date)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') setSelectedDate(day.date);
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {/* Display date in short format (e.g., "Jan 15") */}
-                  <div className="activity-date">
-                    {new Date(day.date).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </div>
-                  {/* Activity indicators for habits and nutrition */}
-                  <div className="activity-indicators">
-                    {day.habits > 0 && (
-                      <span className="activity-badge habits">
-                        {day.habits} habit{day.habits !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                    {day.nutrition > 0 && (
-                      <span className="activity-badge nutrition">
-                        {day.nutrition} meal{day.nutrition !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {selectedDayData && (
-        <div className="activity-details" style={{ marginTop: '1rem' }}>
-          <div className="preview-h" style={{ alignItems: 'center' }}>
-            <h4 className="activity-title" style={{ marginBottom: 0 }}>
-              {new Date(selectedDayData.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            </h4>
-            <button className="btng" onClick={() => setSelectedDate(null)} style={{ fontSize: '0.85rem' }}>
-              Close
-            </button>
-          </div>
-
-          {selectedDayData.habits.length > 0 && (
-            <div style={{ marginTop: '0.75rem' }}>
-              <h5 className="activity-title" style={{ marginBottom: '0.5rem' }}>Habits</h5>
-              <ul className="activity-list">
-                {selectedDayData.habits.map((habit) => (
-                  <li key={habit.id} className="activity-day">
-                    <div className="activity-count">{habit.title}</div>
-                    <span className="activity-badge habits">{habit.completed ? 'Completed' : 'Pending'}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {selectedDayData.nutrition.length > 0 && (
-            <div style={{ marginTop: '0.75rem' }}>
-              <h5 className="activity-title" style={{ marginBottom: '0.5rem' }}>Nutrition</h5>
-              <ul className="activity-list">
-                {selectedDayData.nutrition.map((entry) => (
-                  <li key={entry.id} className="activity-day">
-                    <div className="activity-count">{entry.name}</div>
-                    <span className="activity-badge nutrition">{entry.calories} kcal</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {selectedDayData.habits.length === 0 && selectedDayData.nutrition.length === 0 && (
-            <p className="error-text" style={{ marginTop: '0.5rem' }}>No activity logged for this date.</p>
-          )}
-        </div>
-      )}
 
       {/* Empty state - shown when no activity exists for the month */}
       {totalActivity === 0 && (
@@ -308,7 +328,7 @@ export default function CalendarPreview() {
           </div>
         </div>
       )}
-    </div>
+   
       </div>
   );
 }

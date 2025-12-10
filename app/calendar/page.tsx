@@ -29,6 +29,7 @@ export default function CalendarPage() {
   const [calendarData, setCalendarData] = useState<CalendarData>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedDay, setSelectedDay] = useState<CalendarEntry | null>(null);
 
   useEffect(() => {
     fetchCalendarData();
@@ -94,6 +95,16 @@ export default function CalendarPage() {
       day
     );
     return calendarData[dateKey] || { date: dateKey, habits: [], nutrition: [] };
+  };
+
+  const handleDaySelect = (day: number) => {
+    const data = getDayData(day);
+    setSelectedDay(data);
+  };
+
+  const formatDisplayDate = (dateString: string) => {
+    const d = new Date(dateString);
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   };
 
   const monthNames = [
@@ -166,6 +177,13 @@ export default function CalendarPage() {
               <div
                 key={day}
                 className={`calendar-cell ${hasActivity ? 'has-activity' : ''} ${isToday ? 'today' : ''}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleDaySelect(day)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') handleDaySelect(day);
+                }}
+                style={{ cursor: 'pointer' }}
               >
                 <div className="calendar-day-number">{day}</div>
                 <div className="calendar-day-content">
@@ -202,6 +220,51 @@ export default function CalendarPage() {
           <span>Today</span>
         </div>
       </div>
+
+      {selectedDay && (
+        <div className="glass-card" style={{ marginTop: '1rem' }}>
+          <div className="preview-h" style={{ alignItems: 'center' }}>
+            <h3 className="pantry-title" style={{ marginBottom: 0 }}>{formatDisplayDate(selectedDay.date)}</h3>
+            <button className="btng" onClick={() => setSelectedDay(null)} style={{ fontSize: '0.9rem' }}>
+              Close
+            </button>
+          </div>
+
+          <div className="activity-details" style={{ maxHeight: '260px', overflowY: 'auto' }}>
+            {selectedDay.habits.length > 0 && (
+              <div style={{ marginTop: '0.5rem' }}>
+                <h4 className="activity-title" style={{ marginBottom: '0.4rem' }}>Habits</h4>
+                <ul className="activity-list">
+                  {selectedDay.habits.map((habit) => (
+                    <li key={habit.id} className="activity-day">
+                      <div className="activity-count">{habit.title}</div>
+                      <span className="activity-badge habits">{habit.completed ? 'Completed' : 'Pending'}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {selectedDay.nutrition.length > 0 && (
+              <div style={{ marginTop: '0.75rem' }}>
+                <h4 className="activity-title" style={{ marginBottom: '0.4rem' }}>Nutrition</h4>
+                <ul className="activity-list">
+                  {selectedDay.nutrition.map((entry) => (
+                    <li key={entry.id} className="activity-day">
+                      <div className="activity-count">{entry.name}</div>
+                      <span className="activity-badge nutrition">{entry.calories} kcal</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {selectedDay.habits.length === 0 && selectedDay.nutrition.length === 0 && (
+              <p className="error-text" style={{ marginTop: '0.5rem' }}>No activity logged for this date.</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

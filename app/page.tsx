@@ -5,6 +5,7 @@ import { stackServerApp } from "@/stack/server";
 import NutritionPreview from "./components/NutritionPreview";
 import CalendarPreview from "./components/CalendarPreview";
 import featuring from "./featuring/page";
+
 /**
  * Home Page Component
  *

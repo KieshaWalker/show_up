@@ -140,6 +140,8 @@ export default async function featuring() {
   const uniqueCompletedHabitIds = Array.from(new Set(completedHabitsThisWeek.map((log: any) => log.habit_id)));
   const totalCompletedHabitsThisWeek = uniqueCompletedHabitIds.length;
 
+  const yesterdayCompleted = habitLogs.filter((log: any) => log.completed && toDateKey(log.date) === yesterdayStr);
+
 
   return (
       <div className="c">
@@ -150,6 +152,51 @@ export default async function featuring() {
           habits={habitsWithRemaining}
           displayName={user.displayName || "you"}
         />
+        <div className="glass-card" style={{ marginTop: '1rem', padding: '1rem' }}>
+          <h3 className="preview-title" style={{ marginBottom: '0.5rem' }}>Week Progress</h3>
+          <p className="activity-count" style={{ marginBottom: '0.25rem' }}>
+            Completed habits (unique) this week: {totalCompletedHabitsThisWeek} / {totalPossibleHabitsThisWeek}
+          </p>
+        </div>
+
+        <div className="glass-card" style={{ marginTop: '1rem', padding: '1rem' }}>
+          <div className="preview-h" style={{ alignItems: 'center' }}>
+            <h3 className="preview-title" style={{ marginBottom: 0 }}>Yesterday ({new Date(yesterdayStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })})</h3>
+            {yesterdayCompleted.length > 1 && (
+              <span className="activity-count" style={{ fontSize: '0.9rem' }}>Swipe to browse</span>
+            )}
+          </div>
+
+          {yesterdayCompleted.length ? (
+            <div
+              className="activity-timeline"
+              style={{ display:'flex', gap:'0.5rem', overflowX:'auto', padding:'0.25rem 0', scrollSnapType:'x mandatory' }}
+            >
+              {yesterdayCompleted.map((log: any) => (
+                <div
+                  key={`${log.habit_id}-${log.date}`}
+                  className="activity-day"
+                  style={{
+                    minWidth: '180px',
+                    border: '1px solid var(--glass-border)',
+                    background: 'rgba(255,255,255,0.08)',
+                    padding: '0.75rem',
+                    borderRadius: '12px',
+                    scrollSnapAlign:'start'
+                  }}
+                >
+                  <div className="activity-date" style={{ fontWeight:'bold', marginBottom:'0.25rem' }}>
+                    {new Date(log.date).toLocaleDateString(undefined, { weekday:'long', month: 'short', day: 'numeric' })}
+                  </div>
+                  <div className="activity-count">{log.title || 'Habit'}</div>
+                  <div className="activity-badge habits" style={{ marginTop:'0.35rem' }}>Completed</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="error-text" style={{ margin: 0 }}>No habits completed yesterday.</p>
+          )}
+        </div>
       </div>
   );
 
